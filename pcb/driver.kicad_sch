@@ -1722,6 +1722,11 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 002ee3ce-661d-4d2e-bb52-0d8f42f6efe5)
   )
+  (text "use bipolar power supply module\nthan inverting amplifiers\ninput res is resistor for current calibration\noffset is calibrated via short mosfet\nbipolar adc like mcp3910 to sample output voltage"
+    (at 249.555 64.135 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 099f0a63-503c-4618-a2ec-28153fa5ebc6)
+  )
   (text "current too low" (at 104.14 26.67 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 2d132db3-9ebe-4379-bc67-078841f7bf04)
