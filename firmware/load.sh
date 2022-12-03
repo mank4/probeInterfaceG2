@@ -1,3 +1,4 @@
+export PICO_SDK_PATH=../../../pico/pico-sdk
 export PICO_TOOL_PATH=$PICO_SDK_PATH/../picotool/build
 
 $PICO_TOOL_PATH/picotool reboot -f -u

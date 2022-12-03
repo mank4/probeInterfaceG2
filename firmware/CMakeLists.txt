@@ -9,12 +9,12 @@ pico_sdk_init()
 
 add_executable(probeInterfaceG2)
 
-pico_generate_pio_header(probeInterfaceG2 ${CMAKE_CURRENT_LIST_DIR}/spi.pio)
+pico_generate_pio_header(probeInterfaceG2 ${CMAKE_CURRENT_LIST_DIR}/pio_spi.pio)
 
 target_sources(probeInterfaceG2 PRIVATE
-        spi_loopback.c
-        pio_spi.c
-        pio_spi.h
+        main.cpp
+        pio_spi.cpp
+        pio_spi.hpp
         )
 
 pico_enable_stdio_usb(probeInterfaceG2 1)
