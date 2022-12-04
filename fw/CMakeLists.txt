@@ -9,6 +9,8 @@ pico_sdk_init()
 
 add_executable(probeInterfaceG2)
 
+#Load SCPI Device library: https://github.com/j123b567/scpi-parser
+add_compile_definitions(HAVE_STDBOOL)
 set(SCPI_SRC_PATH "../scpi-parser/libscpi/src")
 add_library(scpi
         ${SCPI_SRC_PATH}/error.c
