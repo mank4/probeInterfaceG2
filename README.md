@@ -17,7 +17,8 @@ probeInterfaceG2 is under development
 
 Clone probeInterfaceG2 next to pico folder containing pico-examples, pico-sdk and picotool.
 
-- Create build folder in firmware and cd into.
+- Clone dependencies: `git submodule init` and `git submodule update`
+- Create build folder in firmware and cd into. `cd fw && mkdir build && cd build`
 - Then run `export PICO_SDK_PATH=../../../pico/pico-sdk` and `cmake ..`
 - Then `make -j4`
 - Then `../load.sh` with the RP2040 connected via USB. Make sure to have set up the [udev rules](https://gist.github.com/alejoseb/c7a7b4c67f0cf665dadabb26a5a87597) and that picotool is build. (With cutecom it is necessary to set DTR checkbox to communicate with RP2040)
