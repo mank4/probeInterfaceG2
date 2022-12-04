@@ -5,6 +5,7 @@
 #include "pio_spi.hpp"
 
 #include "scpi/scpi.h"
+#include "usbtmc_app.h"
 
 // This program instantiates a PIO SPI with each of the four possible
 // CPOL/CPHA combinations, with the serial input and output pin mapped to the
@@ -111,6 +112,8 @@ int main() {
               scpi_error_queue_data, SCPI_ERROR_QUEUE_SIZE
     );
     
+    usbtmc_app_init();
+    
     while (true) {
         for (int cpha = 0; cpha <= 1; ++cpha) {
             spi0.set_cpha(cpha);
@@ -123,14 +126,15 @@ int main() {
                 //test(spi0);
                 //spi0.enable(false);
                 
-                char in[40];
-                if(fgets(in, 40, stdin) != NULL){
+                //char in[40];
+                //if(fgets(in, 40, stdin) != NULL){
                     //printf("%s", in);
-                    SCPI_Input(&scpi_context, in, strlen(in));
-                }
+                //    SCPI_Input(&scpi_context, in, strlen(in));
+                //}
                 //printf("ping\n");
-
-                sleep_ms(2000);
+                //sleep_ms(2000);
+                
+                usbtmc_app_task_iter();
             }
         }
     }

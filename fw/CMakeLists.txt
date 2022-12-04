@@ -12,7 +12,7 @@ add_executable(probeInterfaceG2)
 #Load SCPI Device library: https://github.com/j123b567/scpi-parser
 add_compile_definitions(HAVE_STDBOOL)
 set(SCPI_SRC_PATH "../scpi-parser/libscpi/src")
-add_library(scpi
+add_library(scpi STATIC
         ${SCPI_SRC_PATH}/error.c
         ${SCPI_SRC_PATH}/fifo.c
         ${SCPI_SRC_PATH}/ieee488.c
@@ -25,6 +25,16 @@ add_library(scpi
 )
 target_include_directories(scpi PUBLIC "scpi-parser/libscpi/inc")
 
+#Load USB
+set(USB_SRC_PATH "../usb")
+add_library(usbinst STATIC
+        ${USB_SRC_PATH}/usb_descriptors.c
+        ${USB_SRC_PATH}/usbtmc_app.c
+)
+target_include_directories(usbinst PUBLIC "usb")
+target_link_libraries(usbinst PUBLIC pico_stdlib tinyusb_board tinyusb_device)
+
+#Build main file
 pico_generate_pio_header(probeInterfaceG2 ${CMAKE_CURRENT_LIST_DIR}/pio_spi.pio)
 
 target_sources(probeInterfaceG2 PRIVATE
@@ -33,9 +43,9 @@ target_sources(probeInterfaceG2 PRIVATE
         pio_spi.hpp
         )
 
-pico_enable_stdio_usb(probeInterfaceG2 1)
-pico_enable_stdio_uart(probeInterfaceG2 0)
+#pico_enable_stdio_usb(probeInterfaceG2 1)
+#pico_enable_stdio_uart(probeInterfaceG2 0)
         
 pico_add_extra_outputs(probeInterfaceG2)
         
-target_link_libraries(probeInterfaceG2 PRIVATE pico_stdlib hardware_pio scpi)
+target_link_libraries(probeInterfaceG2 PRIVATE pico_stdlib hardware_pio usbinst scpi)
