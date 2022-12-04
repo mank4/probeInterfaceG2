@@ -9,6 +9,20 @@ pico_sdk_init()
 
 add_executable(probeInterfaceG2)
 
+set(SCPI_SRC_PATH "../scpi-parser/libscpi/src")
+add_library(scpi
+        ${SCPI_SRC_PATH}/error.c
+        ${SCPI_SRC_PATH}/fifo.c
+        ${SCPI_SRC_PATH}/ieee488.c
+        ${SCPI_SRC_PATH}/minimal.c
+        ${SCPI_SRC_PATH}/parser.c
+        ${SCPI_SRC_PATH}/units.c
+        ${SCPI_SRC_PATH}/utils.c
+        ${SCPI_SRC_PATH}/lexer.c
+        ${SCPI_SRC_PATH}/expression.c
+)
+target_include_directories(scpi PUBLIC "scpi-parser/libscpi/inc")
+
 pico_generate_pio_header(probeInterfaceG2 ${CMAKE_CURRENT_LIST_DIR}/pio_spi.pio)
 
 target_sources(probeInterfaceG2 PRIVATE
@@ -22,5 +36,4 @@ pico_enable_stdio_uart(probeInterfaceG2 0)
         
 pico_add_extra_outputs(probeInterfaceG2)
         
-target_link_libraries(probeInterfaceG2 PRIVATE pico_stdlib hardware_pio)
-
+target_link_libraries(probeInterfaceG2 PRIVATE pico_stdlib hardware_pio scpi)

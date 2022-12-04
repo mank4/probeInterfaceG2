@@ -4,6 +4,8 @@
 #include "pico/stdlib.h"
 #include "pio_spi.hpp"
 
+//include "scpi/scpi.h"
+
 // This program instantiates a PIO SPI with each of the four possible
 // CPOL/CPHA combinations, with the serial input and output pin mapped to the
 // same GPIO. Any data written into the state machine's TX FIFO should then be
@@ -16,6 +18,27 @@
 #define PIN_MISO 16 // same as MOSI, so we get loopback
 
 #define BUF_SIZE 150
+
+/*
+scpi_command_t scpi_commands[] = {
+	{ .pattern = "*IDN?", .callback = SCPI_CoreIdnQ,},
+	{ .pattern = "*RST", .callback = SCPI_CoreRst,},
+	{ .pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
+	SCPI_CMD_LIST_END
+};
+
+scpi_interface_t scpi_interface = {
+	.write = myWrite,
+	.error = NULL,
+	.reset = NULL,
+	.srq = NULL,
+};
+
+size_t myWrite(scpi_t * context, const char * data, size_t len) {
+    (void) context;
+    return fwrite(data, 1, len, stdout);
+}
+*/
 
 void test(pioSpi &spi) {
     static uint8_t txbuf[BUF_SIZE];
