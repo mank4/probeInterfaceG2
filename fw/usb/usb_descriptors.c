@@ -30,15 +30,12 @@
 
 /* A combination of interfaces must have a unique product id, since PC will save device driver after the first plug.
  * Same VID/PID with different interface e.g MSC (first), then CDC (later) will possibly cause system error on PC.
- *
- * Auto ProductID layout's Bitmap:
- *   [MSB]         HID | MSC | CDC          [LSB]
  */
-#define _PID_MAP(itf, n)  ( (CFG_TUD_##itf) << (n) )
-#define USB_PID           (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 1) | _PID_MAP(HID, 2) | \
-                           _PID_MAP(MIDI, 3) | _PID_MAP(VENDOR, 4) )
 
-#define USB_VID   0xCafe
+//https://github.com/obdev/v-usb/blob/master/usbdrv/USB-IDs-for-free.txt
+#define USB_VID   0x16c0
+#define USB_PID   0x03e8
+//use USB 2.0
 #define USB_BCD   0x0200
 
 //--------------------------------------------------------------------+
@@ -48,7 +45,7 @@ tusb_desc_device_t const desc_device =
 {
     .bLength            = sizeof(tusb_desc_device_t),
     .bDescriptorType    = TUSB_DESC_DEVICE,
-    .bcdUSB             = 0x0200,
+    .bcdUSB             = USB_BCD,
     .bDeviceClass       = 0x00,
     .bDeviceSubClass    = 0x00,
     .bDeviceProtocol    = 0x00,
@@ -57,7 +54,7 @@ tusb_desc_device_t const desc_device =
 
     .idVendor           = USB_VID,
     .idProduct          = USB_PID,
-    .bcdDevice          = USB_BCD,
+    .bcdDevice          = 0x01, //Device Release Number
 
     .iManufacturer      = 0x01,
     .iProduct           = 0x02,
@@ -193,10 +190,10 @@ uint8_t const * tud_descriptor_configuration_cb(uint8_t index)
 char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-  "TinyUSB",                     // 1: Manufacturer
-  "TinyUSB Device",              // 2: Product
-  "123456",                      // 3: Serials, should use chip ID
-  "TinyUSB USBTMC",              // 4: USBTMC
+  "LTE",                        // 1: Manufacturer
+  "probeInterfaceG2",           // 2: Product
+  "dev",                        // 3: Serials, should use chip ID
+  "IEEE 488.2 usbtmc",             // 4: USBTMC
 };
 
 static uint16_t _desc_str[32];

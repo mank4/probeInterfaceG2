@@ -76,18 +76,13 @@ tud_usbtmc_app_capabilities  =
 #define IEEE4882_STB_SER          (0x20u)
 #define IEEE4882_STB_SRQ          (0x40u)
 
-static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer123456\r\n";
+//static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer123456\r\n";
 //static const char idn[] = "TinyUSB,ModelNumber,SerialNumber,FirmwareVer and a bunch of other text to make it longer than a packet, perhaps? lets make it three transfers...\n";
 static volatile uint8_t status;
 
-// 0=not query, 1=queried, 2=delay,set(MAV), 3=delay 4=ready?
-// (to simulate delay)
 static volatile uint16_t queryState = 0;
-static volatile uint32_t queryDelayStart;
 static volatile uint32_t bulkInStarted;
-static volatile uint32_t idnQuery;
 
-static uint32_t resp_delay = 125u; // Adjustable delay, to allow for better testing
 static size_t buffer_len;
 static size_t buffer_tx_ix; // for transmitting using multiple transfers
 static uint8_t buffer[225]; // A few packets long should be enough.
@@ -151,29 +146,14 @@ bool tud_usbtmc_msg_data_cb(void *data, size_t len, bool transfer_complete)
     return false; // buffer overflow!
   }
   queryState = transfer_complete;
-  idnQuery = 0;
 
-  if(transfer_complete && (len >=4) && !strncasecmp("*idn?",data,4))
-  {
-    idnQuery = 1;
-  }
-  if(transfer_complete && !strncasecmp("delay ",data,5))
-  {
-    queryState = 0;
-    int d = atoi((char*)data + 5);
-    if(d > 10000)
-      d = 10000;
-    if(d<0)
-      d=0;
-    resp_delay = (uint32_t)d;
-  }
   tud_usbtmc_start_bus_read();
   return true;
 }
 
 bool tud_usbtmc_msgBulkIn_complete_cb()
 {
-  if((buffer_tx_ix == buffer_len) || idnQuery) // done
+  if(buffer_tx_ix == buffer_len) // done
   {
     status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
     queryState = 0;
@@ -185,6 +165,7 @@ bool tud_usbtmc_msgBulkIn_complete_cb()
   return true;
 }
 
+//maximum length allowed for the computer
 static unsigned int msgReqLen;
 
 bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * request)
@@ -217,48 +198,36 @@ bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * reque
 }
 
 void usbtmc_app_task_iter(void) {
-    //TODO check if this is right here
-    tud_task();
+  tud_task();
     
-  switch(queryState) {
-  case 0:
-    break;
-  case 1:
-    queryDelayStart = board_millis();
-    queryState = 2;
-    break;
-  case 2:
-    if( (board_millis() - queryDelayStart) > resp_delay) {
-      queryDelayStart = board_millis();
-      queryState=3;
+  if(queryState && bulkInStarted && (buffer_tx_ix == 0)) // time to transmit;
+  {
       status |= 0x10u; // MAV
       status |= 0x40u; // SRQ
-    }
-    break;
-  case 3:
-    if( (board_millis() - queryDelayStart) > resp_delay) {
-      queryState = 4;
-    }
-    break;
-  case 4: // time to transmit;
-    if(bulkInStarted && (buffer_tx_ix == 0)) {
-      if(idnQuery)
+      
+      size_t dataLen = usbtmc_app_cmd_cb(buffer, buffer_len, sizeof(buffer));
+      tud_usbtmc_transmit_dev_msg_data(buffer, tu_min32(dataLen, msgReqLen),true,false);
+      
+      /*
+      //these are some test functions
+      if(buffer_len >=4 && !strncasecmp("*idn?",buffer,4))
       {
-        tud_usbtmc_transmit_dev_msg_data(idn,  tu_min32(sizeof(idn)-1,msgReqLen),true,false);
-        queryState = 0;
-        bulkInStarted = 0;
+        uint8_t test[200] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sollicitudin semper sem quis feugiat. Donec efficitur felis non elit eleifend posuere. ";
+        memcpy(buffer, test, 200);
+        test[3] = 'd';
+        tud_usbtmc_transmit_dev_msg_data(buffer,  tu_min32(sizeof(test)-1,msgReqLen),true,false);
+        //tud_usbtmc_transmit_dev_msg_data(test,  tu_min32(sizeof(test)-1,msgReqLen),true,false);
+        //tud_usbtmc_transmit_dev_msg_data(idn,  tu_min32(sizeof(idn)-1,msgReqLen),true,false);
       }
       else
       {
-        buffer_tx_ix = tu_min32(buffer_len,msgReqLen);
-        tud_usbtmc_transmit_dev_msg_data(buffer, buffer_tx_ix, buffer_tx_ix == buffer_len, false);
+        //buffer[0] = '0' + msgReqLen>>10;
+        tud_usbtmc_transmit_dev_msg_data(buffer, tu_min32(buffer_len,msgReqLen), true,false);
       }
+      */
+      queryState = 0;
+      bulkInStarted = 0;
       // MAV is cleared in the transfer complete callback.
-    }
-    break;
-  default:
-    TU_ASSERT(false,);
-    return;
   }
 }
 
@@ -328,10 +297,11 @@ uint8_t tud_usbtmc_get_stb_cb(uint8_t *tmcResult)
   return old_status;
 }
 
-bool tud_usbtmc_indicator_pulse_cb(tusb_control_request_t const * msg, uint8_t *tmcResult)
+/*bool tud_usbtmc_indicator_pulse_cb(tusb_control_request_t const * msg, uint8_t *tmcResult)
 {
   (void)msg;
   //led_indicator_pulse();
   *tmcResult = USBTMC_STATUS_SUCCESS;
   return true;
 }
+*/

@@ -84,6 +84,15 @@ void test(pioSpi &spi) {
         printf("\nOK\n");
 }
 
+size_t usbtmc_app_cmd_cb(uint8_t* ioData, size_t ioDataLen, size_t bufferLen)
+{
+    //use usb internal buffer and SCPI_Parse
+    //use scpi library for ieee488.2
+    ioData[0] = 'h';
+    ioData[1] = 'i';
+    return ioDataLen;
+}
+
 int main() {
     stdio_init_all();
     

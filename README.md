@@ -22,7 +22,11 @@ Clone probeInterfaceG2 next to pico folder containing pico-examples, pico-sdk an
 - Then run `export PICO_SDK_PATH=../../../pico/pico-sdk` and `cmake ..`
 - Then `make -j4`
 - If compilation fails with USB descriptor length fails do the following, cd into pico-sdk folder and `cd lib/tinyusb/` and then `git pull origin master`
-- Then `../load.sh` with the RP2040 connected via USB. Make sure to have set up the [udev rules](https://gist.github.com/alejoseb/c7a7b4c67f0cf665dadabb26a5a87597) and that picotool is build. (With cutecom it is necessary to set DTR checkbox to communicate with RP2040)
+- Then `../load.sh` with the RP2040 connected via USB. Press the button before pluggin in. Make sure that picotool is build and you have set up the udev rules for the pico [udev rules](https://gist.github.com/alejoseb/c7a7b4c67f0cf665dadabb26a5a87597) and the probeInterfaceG2:
+```
+/etc/udev/rules.d/99-probeInterfaceG2.rules
+SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="03e8",  MODE="0666", GROUP="usbtmc"
+```
 
 For details see the [Getting started](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf) guide.
 
