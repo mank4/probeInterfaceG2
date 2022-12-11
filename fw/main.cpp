@@ -23,8 +23,8 @@
 #define SCPI_ERROR_QUEUE_SIZE 17
 scpi_error_t scpi_error_queue_data[SCPI_ERROR_QUEUE_SIZE];
 
-#define SCPI_INPUT_BUFFER_LENGTH 256
-static char scpi_input_buffer[SCPI_INPUT_BUFFER_LENGTH];
+//#define SCPI_INPUT_BUFFER_LENGTH 256
+//static char scpi_input_buffer[SCPI_INPUT_BUFFER_LENGTH];
 
 scpi_result_t DMM_MeasureVoltageDcQ(scpi_t * context) {
     SCPI_ResultDouble(context, 3.14);
@@ -38,20 +38,34 @@ scpi_command_t scpi_commands[] = {
 	SCPI_CMD_LIST_END
 };
 
-size_t myWrite(scpi_t * context, const char * data, size_t len) {
+scpi_t scpi_context;
+
+size_t scpi_write(scpi_t * context, const char * data, size_t len) {
     (void) context;
-    return fwrite(data, 1, len, stdout);
+    usbtmc_app_response(data, len, false);
+    return len;
+}
+
+scpi_result_t scpi_flush(scpi_t* context) {
+    usbtmc_app_response(NULL, 0, true);
+    return SCPI_RES_OK;
+}
+
+void usbtmc_app_query_cb(char* data, size_t len)
+{
+    //use usb internal buffer and SCPI_Parse
+    //use scpi library for ieee488.2
+    SCPI_Parse(&scpi_context, data, len);
+    return;
 }
 
 scpi_interface_t scpi_interface = {
     /*.error = */ NULL,
-    /*.write = */ myWrite,
+    /*.write = */ scpi_write,
     /*.control = */ NULL,
-    /*.flush = */ NULL,
+    /*.flush = */ scpi_flush,
     /*.reset = */ NULL,
 };
-
-scpi_t scpi_context;
 
 void test(pioSpi &spi) {
     static uint8_t txbuf[BUF_SIZE];
@@ -84,15 +98,6 @@ void test(pioSpi &spi) {
         printf("\nOK\n");
 }
 
-size_t usbtmc_app_cmd_cb(uint8_t* ioData, size_t ioDataLen, size_t bufferLen)
-{
-    //use usb internal buffer and SCPI_Parse
-    //use scpi library for ieee488.2
-    ioData[0] = 'h';
-    ioData[1] = 'i';
-    return ioDataLen;
-}
-
 int main() {
     stdio_init_all();
     
@@ -117,7 +122,7 @@ int main() {
               &scpi_interface,
               scpi_units_def,
               "LTE", "probeInterface", "G2", "dev",
-              scpi_input_buffer, SCPI_INPUT_BUFFER_LENGTH,
+              NULL, 0, //scpi_input_buffer, SCPI_INPUT_BUFFER_LENGTH,
               scpi_error_queue_data, SCPI_ERROR_QUEUE_SIZE
     );
     

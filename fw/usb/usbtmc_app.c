@@ -202,11 +202,11 @@ void usbtmc_app_task_iter(void) {
     
   if(queryState && bulkInStarted && (buffer_tx_ix == 0)) // time to transmit;
   {
-      status |= 0x10u; // MAV
-      status |= 0x40u; // SRQ
+      //status |= 0x10u; // MAV
+      //status |= 0x40u; // SRQ
       
-      size_t dataLen = usbtmc_app_cmd_cb(buffer, buffer_len, sizeof(buffer));
-      tud_usbtmc_transmit_dev_msg_data(buffer, tu_min32(dataLen, msgReqLen),true,false);
+      usbtmc_app_query_cb(buffer, buffer_len);
+      //tud_usbtmc_transmit_dev_msg_data(buffer, tu_min32(dataLen, msgReqLen),true,false);
       
       /*
       //these are some test functions
@@ -228,6 +228,19 @@ void usbtmc_app_task_iter(void) {
       queryState = 0;
       bulkInStarted = 0;
       // MAV is cleared in the transfer complete callback.
+  }
+}
+
+void usbtmc_app_response(const void* data, size_t len, bool endOfMessage)
+{
+  static size_t respPos = 0;
+  if(!endOfMessage) {
+    size_t writeLen = tu_min32(len, sizeof(buffer)-respPos);
+    memcpy(&buffer[respPos], data, writeLen);
+    respPos += writeLen;
+  } else {
+    tud_usbtmc_transmit_dev_msg_data(buffer, tu_min32(respPos, msgReqLen),true,false);
+    respPos = 0;
   }
 }
 
