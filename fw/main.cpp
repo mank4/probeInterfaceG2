@@ -26,15 +26,51 @@ scpi_error_t scpi_error_queue_data[SCPI_ERROR_QUEUE_SIZE];
 //#define SCPI_INPUT_BUFFER_LENGTH 256
 //static char scpi_input_buffer[SCPI_INPUT_BUFFER_LENGTH];
 
+bool scpi_doIndicatorPulse = 0;
+absolute_time_t scpi_doIndicatorPulseUntil;
+
 scpi_result_t DMM_MeasureVoltageDcQ(scpi_t * context) {
     SCPI_ResultDouble(context, 3.14);
     return SCPI_RES_OK;
 }
 
 scpi_command_t scpi_commands[] = {
-	{ .pattern = "*IDN?", .callback = SCPI_CoreIdnQ,},
-	{ .pattern = "*RST", .callback = SCPI_CoreRst,},
+    /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
+    {"*CLS", SCPI_CoreCls, 0},
+    {"*ESE", SCPI_CoreEse, 0},
+    {"*ESE?", SCPI_CoreEseQ, 0},
+    {"*ESR?", SCPI_CoreEsrQ, 0},
+    {"*IDN?", SCPI_CoreIdnQ, 0},
+    {"*OPC", SCPI_CoreOpc, 0},
+    {"*OPC?", SCPI_CoreOpcQ, 0},
+    {"*RST", SCPI_CoreRst, 0},
+    {"*SRE", SCPI_CoreSre, 0},
+    {"*SRE?", SCPI_CoreSreQ, 0},
+    {"*STB?", SCPI_CoreStbQ, 0},
+    {"*TST?", SCPI_CoreTstQ, 0},
+    {"*WAI", SCPI_CoreWai, 0},
+    
+    /* Required SCPI commands (SCPI std V1999.0 4.2.1) */
+    {"SYSTem:ERRor[:NEXT]?", SCPI_SystemErrorNextQ, 0},
+    {"SYSTem:ERRor:COUNt?", SCPI_SystemErrorCountQ, 0},
+    {"SYSTem:VERSion?", SCPI_SystemVersionQ, 0},
+
+    //{"STATus:OPERation?", scpi_stub_callback, 0},
+    //{"STATus:OPERation:EVENt?", scpi_stub_callback, 0},
+    //{"STATus:OPERation:CONDition?", scpi_stub_callback, 0},
+    //{"STATus:OPERation:ENABle", scpi_stub_callback, 0},
+    //{"STATus:OPERation:ENABle?", scpi_stub_callback, 0},
+
+    {"STATus:QUEStionable[:EVENt]?", SCPI_StatusQuestionableEventQ, 0},
+    //{"STATus:QUEStionable:CONDition?", scpi_stub_callback, 0},
+    {"STATus:QUEStionable:ENABle", SCPI_StatusQuestionableEnable, 0},
+    {"STATus:QUEStionable:ENABle?", SCPI_StatusQuestionableEnableQ, 0},
+
+    {"STATus:PRESet", SCPI_StatusPreset, 0},
+    
+    /* probeInterface */
 	{ .pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
+    
 	SCPI_CMD_LIST_END
 };
 
@@ -47,6 +83,7 @@ size_t scpi_write(scpi_t * context, const char * data, size_t len) {
 }
 
 scpi_result_t scpi_flush(scpi_t* context) {
+    SCPI_RegSetBits(context, SCPI_REG_STB, STB_MAV);
     usbtmc_app_response(NULL, 0, true);
     return SCPI_RES_OK;
 }
@@ -57,6 +94,35 @@ void usbtmc_app_query_cb(char* data, size_t len)
     //use scpi library for ieee488.2
     SCPI_Parse(&scpi_context, data, len);
     return;
+}
+
+uint8_t usbtmc_app_get_stb_cb(void)
+{
+    uint8_t status = SCPI_RegGet(&scpi_context, SCPI_REG_STB);
+    SCPI_RegClearBits(&scpi_context, SCPI_REG_STB, STB_SRQ);
+    return status;
+}
+
+void usbtmc_app_clear_stb_cb(void)
+{
+    SCPI_RegClearBits(&scpi_context, SCPI_REG_STB, 0xff);
+}
+
+void usbtmc_app_clear_mav_cb(void)
+{
+    SCPI_RegClearBits(&scpi_context, SCPI_REG_STB, STB_MAV);
+}
+
+void usbtmc_app_set_srq_cb(void)
+{
+    SCPI_RegSetBits(&scpi_context, SCPI_REG_STB, STB_SRQ);
+}
+
+void usbtmc_app_indicator_cb(void)
+{
+    gpio_put(PIN_LED, 1);
+    scpi_doIndicatorPulse = true;
+    scpi_doIndicatorPulseUntil = make_timeout_time_ms(750);
 }
 
 scpi_interface_t scpi_interface = {
@@ -121,7 +187,7 @@ int main() {
               scpi_commands,
               &scpi_interface,
               scpi_units_def,
-              "LTE", "probeInterface", "G2", "dev",
+              "LTE", "probeInterface", "G2", "devadsfaldskfjdsajflsadjfdsafuwefjlskdnflsdajfdsalflsdaffdsfdsafsadfsafdsafsdafdsafasdfdsfsadfdsfdsfdsfsdafdsafddfsafsarewgtfgdsaflkjdshldsfsadjföldsnajdskfndsahgfasmlfdösjlkföldsafpoewsamglnlapsdjgflsanpoueitjhlsfsadfsdfsfewrwetdfsadhdfgsrgsafwertsldflsadfnsdprobe",
               NULL, 0, //scpi_input_buffer, SCPI_INPUT_BUFFER_LENGTH,
               scpi_error_queue_data, SCPI_ERROR_QUEUE_SIZE
     );
@@ -147,6 +213,11 @@ int main() {
                 //}
                 //printf("ping\n");
                 //sleep_ms(2000);
+                
+                if(scpi_doIndicatorPulse && get_absolute_time() > scpi_doIndicatorPulseUntil) {
+                    scpi_doIndicatorPulse = false;
+                    gpio_put(PIN_LED, 0);
+                }
                 
                 usbtmc_app_task_iter();
             }

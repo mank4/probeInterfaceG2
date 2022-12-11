@@ -76,7 +76,7 @@
 
 #define CFG_TUD_USBTMC                1
 #define CFG_TUD_USBTMC_ENABLE_INT_EP  1
-#define CFG_TUD_USBTMC_ENABLE_488     0
+#define CFG_TUD_USBTMC_ENABLE_488     1
 
 #ifdef __cplusplus
  }

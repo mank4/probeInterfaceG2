@@ -16,6 +16,13 @@ void usbtmc_app_query_cb(char* data, size_t len);
 
 void usbtmc_app_response(const void* data, size_t len, bool endOfMessage);
 
+uint8_t usbtmc_app_get_stb_cb(void);
+void usbtmc_app_clear_stb_cb(void);
+void usbtmc_app_clear_mav_cb(void);
+void usbtmc_app_set_srq_cb(void);
+
+void usbtmc_app_indicator_cb(void);
+
 #ifdef	__cplusplus
 }
 #endif
