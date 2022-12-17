@@ -34,6 +34,28 @@ scpi_result_t DMM_MeasureVoltageDcQ(scpi_t * context) {
     return SCPI_RES_OK;
 }
 
+char retVal[500] = "hm";
+static scpi_result_t pi_echo(scpi_t* context) {
+    const char* text;
+    size_t text_len = 3;
+    
+    char error[1] = "";
+    
+    //if(!SCPI_ParamCharacters(context, &text, &text_len, true)) {
+    //    text = error;
+    //    text_len = 1;
+    //}
+
+    if(!SCPI_ParamCopyText(context, retVal, sizeof(retVal), &text_len, true)) {
+        
+    }
+    
+    //SCPI_ResultCharacters(context, text, text_len);
+    SCPI_ResultCharacters(context, retVal, text_len);
+    
+    return SCPI_RES_OK;
+}
+
 scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
     {"*CLS", SCPI_CoreCls, 0},
@@ -69,6 +91,7 @@ scpi_command_t scpi_commands[] = {
     {"STATus:PRESet", SCPI_StatusPreset, 0},
     
     /* probeInterface */
+    { .pattern = "ECHO", .callback = pi_echo,},
 	{ .pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
     
 	SCPI_CMD_LIST_END
@@ -187,7 +210,7 @@ int main() {
               scpi_commands,
               &scpi_interface,
               scpi_units_def,
-              "LTE", "probeInterface", "G2", "devadsfaldskfjdsajflsadjfdsafuwefjlskdnflsdajfdsalflsdaffdsfdsafsadfsafdsafsdafdsafasdfdsfsadfdsfdsfdsfsdafdsafddfsafsarewgtfgdsaflkjdshldsfsadjföldsnajdskfndsahgfasmlfdösjlkföldsafpoewsamglnlapsdjgflsanpoueitjhlsfsadfsdfsfewrwetdfsadhdfgsrgsafwertsldflsadfnsdprobe",
+              "LTE", "probeInterface", "G2", "dev",
               NULL, 0, //scpi_input_buffer, SCPI_INPUT_BUFFER_LENGTH,
               scpi_error_queue_data, SCPI_ERROR_QUEUE_SIZE
     );

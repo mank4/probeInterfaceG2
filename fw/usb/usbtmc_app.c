@@ -84,8 +84,8 @@ static volatile uint16_t queryState = 0;
 //static volatile uint32_t bulkInStarted;
 
 static size_t buffer_len = 0;
-//static size_t buffer_tx_ix; // for transmitting using multiple transfers
-static uint8_t buffer[225]; // A few packets long should be enough.
+static size_t buffer_tx = 0; // for transmitting using multiple transfers
+static uint8_t buffer[500]; // A few packets long should be enough.
 
 
 static usbtmc_msg_dev_dep_msg_in_header_t rspMsg = {
@@ -158,8 +158,10 @@ bool tud_usbtmc_msg_data_cb(void *data, size_t len, bool transfer_complete)
 //send data to computer
 bool tud_usbtmc_msgBulkIn_complete_cb()
 {
-  usbtmc_app_clear_mav_cb(); //status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
-  queryState = 0;
+  if(buffer_tx == buffer_len) {
+    usbtmc_app_clear_mav_cb(); //status &= (uint8_t)~(IEEE4882_STB_MAV); // clear MAV
+    queryState = 0;
+  }
     
   tud_usbtmc_start_bus_read();
 
@@ -185,8 +187,9 @@ bool tud_usbtmc_msgBulkIn_request_cb(usbtmc_msg_request_dev_dep_in const * reque
   }
   else if(queryState == 3)
   {
-    buffer_len = tu_min32(buffer_len, msgReqLen);
-    tud_usbtmc_transmit_dev_msg_data(buffer, buffer_len,true,false);
+    size_t tx_len = tu_min32(buffer_len-buffer_tx, msgReqLen); //length of data to transmit, limited by msgReqLen
+    tud_usbtmc_transmit_dev_msg_data(&buffer[buffer_tx], tx_len, buffer_tx+tx_len == buffer_len, false);
+    buffer_tx+=tx_len;
   }
   // Always return true indicating not to stall the EP.
   return true;
@@ -213,6 +216,7 @@ void usbtmc_app_response(const void* data, size_t len, bool endOfMessage)
     buffer_len += writeLen;
   } else {
     queryState = 3;
+    buffer_tx = 0;
   }
 }
 
