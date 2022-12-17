@@ -36,21 +36,12 @@ scpi_result_t DMM_MeasureVoltageDcQ(scpi_t * context) {
 
 char retVal[500] = "hm";
 static scpi_result_t pi_echo(scpi_t* context) {
-    const char* text;
     size_t text_len = 3;
     
-    char error[1] = "";
-    
-    //if(!SCPI_ParamCharacters(context, &text, &text_len, true)) {
-    //    text = error;
-    //    text_len = 1;
-    //}
-
     if(!SCPI_ParamCopyText(context, retVal, sizeof(retVal), &text_len, true)) {
         
     }
     
-    //SCPI_ResultCharacters(context, text, text_len);
     SCPI_ResultCharacters(context, retVal, text_len);
     
     return SCPI_RES_OK;
@@ -138,7 +129,14 @@ void usbtmc_app_clear_mav_cb(void)
 
 void usbtmc_app_set_srq_cb(void)
 {
-    SCPI_RegSetBits(&scpi_context, SCPI_REG_STB, STB_SRQ);
+    scpi_context.registers[SCPI_REG_STB] |= STB_SRQ;
+    //SCPI_RegSetBits(&scpi_context, SCPI_REG_STB, STB_SRQ);
+}
+
+void usbtmc_app_clear_srq_cb(void)
+{
+    scpi_context.registers[SCPI_REG_STB] &= ~STB_SRQ;
+    //SCPI_RegClearBits(&scpi_context, SCPI_REG_STB, STB_SRQ);
 }
 
 void usbtmc_app_indicator_cb(void)

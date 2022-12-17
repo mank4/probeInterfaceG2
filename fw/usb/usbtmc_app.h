@@ -20,6 +20,7 @@ uint8_t usbtmc_app_get_stb_cb(void);
 void usbtmc_app_clear_stb_cb(void);
 void usbtmc_app_clear_mav_cb(void);
 void usbtmc_app_set_srq_cb(void);
+void usbtmc_app_clear_srq_cb(void);
 
 void usbtmc_app_indicator_cb(void);
 

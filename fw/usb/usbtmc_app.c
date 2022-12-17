@@ -276,6 +276,7 @@ uint8_t tud_usbtmc_get_stb_cb(uint8_t *tmcResult)
 {
   //clear srq in usbtmc_app_get_status_cb after reading
   uint8_t status = usbtmc_app_get_stb_cb();
+  usbtmc_app_clear_srq_cb();
 
   *tmcResult = USBTMC_STATUS_SUCCESS;
   // Increment status so that we see different results on each read...
