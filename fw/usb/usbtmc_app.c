@@ -85,7 +85,7 @@ static volatile uint16_t queryState = 0;
 
 static size_t buffer_len = 0;
 static size_t buffer_tx = 0; // for transmitting using multiple transfers
-static uint8_t buffer[500]; // A few packets long should be enough.
+static uint8_t buffer[8300]; // A few packets long should be enough.
 
 
 static usbtmc_msg_dev_dep_msg_in_header_t rspMsg = {

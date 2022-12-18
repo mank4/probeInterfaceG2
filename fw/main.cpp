@@ -7,18 +7,11 @@
 #include "scpi/scpi.h"
 #include "usbtmc_app.h"
 
-// This program instantiates a PIO SPI with each of the four possible
-// CPOL/CPHA combinations, with the serial input and output pin mapped to the
-// same GPIO. Any data written into the state machine's TX FIFO should then be
-// serialised, deserialised, and reappear in the state machine's RX FIFO.
-
 #define PIN_LED 25
 
 #define PIN_SCK 18
 #define PIN_MOSI 16
 #define PIN_MISO 16 // same as MOSI, so we get loopback
-
-#define BUF_SIZE 150
 
 #define SCPI_ERROR_QUEUE_SIZE 17
 scpi_error_t scpi_error_queue_data[SCPI_ERROR_QUEUE_SIZE];
@@ -29,13 +22,19 @@ scpi_error_t scpi_error_queue_data[SCPI_ERROR_QUEUE_SIZE];
 bool scpi_doIndicatorPulse = 0;
 absolute_time_t scpi_doIndicatorPulseUntil;
 
+//###########################################
+// SCPI callbacks
+//###########################################
+
+pioSpi spi0;
+
 scpi_result_t DMM_MeasureVoltageDcQ(scpi_t * context) {
     SCPI_ResultDouble(context, 3.14);
     return SCPI_RES_OK;
 }
 
-char retVal[500] = "hm";
 static scpi_result_t pi_echo(scpi_t* context) {
+    char retVal[500] = "hm";
     size_t text_len = 3;
     
     if(!SCPI_ParamCopyText(context, retVal, sizeof(retVal), &text_len, true)) {
@@ -46,6 +45,35 @@ static scpi_result_t pi_echo(scpi_t* context) {
     
     return SCPI_RES_OK;
 }
+
+//syntax is #<num of byte digits><num of bytes><data>
+//e.g. #18abcdefgh
+static scpi_result_t pi_spi_transfer(scpi_t* context) {  
+    const char* data_rx;
+    size_t len = 0;
+    
+    if(SCPI_ParamArbitraryBlock(context, &data_rx, &len, true)) {
+        char* data_tx = (char*)malloc(len);
+        if(data_tx == NULL) {
+            SCPI_ErrorPush(context, SCPI_ERROR_EXECUTION_ERROR);
+        } else {
+            spi0.enable(true);
+            spi0.rw8_blocking((uint8_t*)data_rx, (uint8_t*)data_tx, len);
+            spi0.enable(false);
+            SCPI_ResultArbitraryBlock(context, data_tx, len);
+            //SCPI_ResultArrayUInt8(context, (const uint8_t*)data, len, SCPI_FORMAT_LITTLEENDIAN);
+            free(data_tx);
+        }       
+    } else {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    }
+    
+    return SCPI_RES_OK;
+}
+
+//###########################################
+// SCPI callback definition
+//###########################################
 
 scpi_command_t scpi_commands[] = {
     /* IEEE Mandated Commands (SCPI std V1999.0 4.1.1) */
@@ -84,6 +112,7 @@ scpi_command_t scpi_commands[] = {
     /* probeInterface */
     { .pattern = "ECHO", .callback = pi_echo,},
 	{ .pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
+    { .pattern = "SPI:TRANSfer?", .callback = pi_spi_transfer,},
     
 	SCPI_CMD_LIST_END
 };
@@ -101,6 +130,18 @@ scpi_result_t scpi_flush(scpi_t* context) {
     usbtmc_app_response(NULL, 0, true);
     return SCPI_RES_OK;
 }
+
+scpi_interface_t scpi_interface = {
+    /*.error = */ NULL,
+    /*.write = */ scpi_write,
+    /*.control = */ NULL,
+    /*.flush = */ scpi_flush,
+    /*.reset = */ NULL,
+};
+
+//###########################################
+// USB callbacks
+//###########################################
 
 void usbtmc_app_query_cb(char* data, size_t len)
 {
@@ -139,6 +180,7 @@ void usbtmc_app_clear_srq_cb(void)
     //SCPI_RegClearBits(&scpi_context, SCPI_REG_STB, STB_SRQ);
 }
 
+//indicator light is required by IEEE 488.2
 void usbtmc_app_indicator_cb(void)
 {
     gpio_put(PIN_LED, 1);
@@ -146,44 +188,9 @@ void usbtmc_app_indicator_cb(void)
     scpi_doIndicatorPulseUntil = make_timeout_time_ms(750);
 }
 
-scpi_interface_t scpi_interface = {
-    /*.error = */ NULL,
-    /*.write = */ scpi_write,
-    /*.control = */ NULL,
-    /*.flush = */ scpi_flush,
-    /*.reset = */ NULL,
-};
-
-void test(pioSpi &spi) {
-    static uint8_t txbuf[BUF_SIZE];
-    static uint8_t rxbuf[BUF_SIZE];
-    printf("TX:");
-    for (int i = 0; i < BUF_SIZE; ++i) {
-        txbuf[i] = rand() >> 16;
-        rxbuf[i] = 0;
-        //printf(" %02x", (int) txbuf[i]);
-    }
-    printf("\n");
-    
-    sleep_ms(200);
-
-    spi.enable(true);
-    spi.rw8_blocking(txbuf, rxbuf, BUF_SIZE);
-    spi.enable(false);
-
-    sleep_ms(200);
-    
-    printf("RX:");
-    bool mismatch = false;
-    for (int i = 0; i < BUF_SIZE; ++i) {
-        //printf(" %02x", (int) rxbuf[i]);
-        mismatch = mismatch || rxbuf[i] != txbuf[i];
-    }
-    if (mismatch)
-        printf("\nNope\n");
-    else
-        printf("\nOK\n");
-}
+//###########################################
+// main application
+//###########################################
 
 int main() {
     stdio_init_all();
@@ -191,18 +198,17 @@ int main() {
     gpio_init(PIN_LED);
     gpio_set_dir(PIN_LED, GPIO_OUT);
     gpio_put(PIN_LED, 1);
-    
-    gpio_put(PIN_LED, 1);
-    printf("RP2040 booting...\n");
+    //printf("RP2040 booting...\n");
     sleep_ms(1000);
     gpio_put(PIN_LED, 0);
-    sleep_ms(1000);
         
-    pioSpi spi0;
+    //pioSpi spi0; //we need this global
     spi0.set_sck_pin(PIN_SCK);
     spi0.set_miso_pin(PIN_MISO);
     spi0.set_mosi_pin(PIN_MOSI);
     spi0.set_baudrate(5);
+    spi0.set_cpha(0);
+    spi0.set_cpol(0);
     
     SCPI_Init(&scpi_context,
               scpi_commands,
@@ -216,32 +222,11 @@ int main() {
     usbtmc_app_init();
     
     while (true) {
-        for (int cpha = 0; cpha <= 1; ++cpha) {
-            spi0.set_cpha(cpha);
-            
-            for (int cpol = 0; cpol <= 0; ++cpol) {
-                spi0.set_cpol(cpol);
-                //printf("CPHA = %d, CPOL = %d\n", cpha, cpol);
-                
-                //spi0.enable(true);
-                //test(spi0);
-                //spi0.enable(false);
-                
-                //char in[40];
-                //if(fgets(in, 40, stdin) != NULL){
-                    //printf("%s", in);
-                //    SCPI_Input(&scpi_context, in, strlen(in));
-                //}
-                //printf("ping\n");
-                //sleep_ms(2000);
-                
-                if(scpi_doIndicatorPulse && get_absolute_time() > scpi_doIndicatorPulseUntil) {
-                    scpi_doIndicatorPulse = false;
-                    gpio_put(PIN_LED, 0);
-                }
-                
-                usbtmc_app_task_iter();
-            }
+        if(scpi_doIndicatorPulse && get_absolute_time() > scpi_doIndicatorPulseUntil) {
+            scpi_doIndicatorPulse = false;
+            gpio_put(PIN_LED, 0);
         }
+        
+        usbtmc_app_task_iter();
     }
 }
