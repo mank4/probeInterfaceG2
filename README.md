@@ -1,6 +1,6 @@
 # probeInterfaceG2
 
-probeInterfaceG2 is under development
+probeInterfaceG2 is under development. Firmware features usbtmc, scpi parser and pio based spi do already work. It is possible to send and receive SPI data.
 
 ## (planned) Hardware
 
@@ -21,8 +21,8 @@ Clone probeInterfaceG2 next to pico folder containing pico-examples, pico-sdk an
 - Create build folder in firmware and cd into. `cd fw && mkdir build && cd build`
 - Then run `export PICO_SDK_PATH=../../../pico/pico-sdk` and `cmake ..`
 - Then `make -j4`
-- If compilation fails with USB descriptor length fails do the following, cd into pico-sdk folder and `cd lib/tinyusb/` and then `git pull origin master`
-- Then `../load.sh` with the RP2040 connected via USB. Press the button before pluggin in. Make sure that picotool is build and you have set up the udev rules for the pico [udev rules](https://gist.github.com/alejoseb/c7a7b4c67f0cf665dadabb26a5a87597) and the probeInterfaceG2:
+- If compilation fails with USB descriptor length errors, do the following, cd into pico-sdk folder and `cd lib/tinyusb/` and then `git pull origin master`
+- Then `../load.sh` with the RP2040 connected via USB. Press the button before pluggin in. (This is not needed when running the firmware. Make sure that picotool is build and you have set up the udev rules for the pico [udev rules](https://gist.github.com/alejoseb/c7a7b4c67f0cf665dadabb26a5a87597) and the probeInterfaceG2:
 ```
 /etc/udev/rules.d/99-probeInterfaceG2.rules
 SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="03e8",  MODE="0666", GROUP="usbtmc"

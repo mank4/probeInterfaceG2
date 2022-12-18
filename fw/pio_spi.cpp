@@ -96,6 +96,10 @@ bool pioSpi::set_baudrate(float baudMHz) {
     return true;
 }
 
+float pioSpi::get_baudrate(void) {
+    return 31.25f/clkdiv;
+}
+
 bool pioSpi::enable(bool on) {
     if((on && isEnabled) || (!on && !isEnabled))
         return true;

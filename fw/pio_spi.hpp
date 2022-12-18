@@ -42,6 +42,7 @@ public:
     bool set_cpol(bool _cpol);
     
     bool set_baudrate(float baudMHz);
+    float get_baudrate(void);
     
     bool reset();
     bool enable(bool on);

@@ -30,11 +30,6 @@ absolute_time_t scpi_doIndicatorPulseUntil;
 //we could add a second spi later so lets call it spi0
 pioSpi spi0;
 
-scpi_result_t DMM_MeasureVoltageDcQ(scpi_t * context) {
-    SCPI_ResultDouble(context, 3.14);
-    return SCPI_RES_OK;
-}
-
 static scpi_result_t pi_echo(scpi_t* context) {
     char retVal[500] = "hm";
     size_t text_len = 3;
@@ -121,6 +116,49 @@ static scpi_result_t pi_spi_mosi(scpi_t* context) {
     return SCPI_RES_OK;
 }
 
+static scpi_result_t pi_spi_set_cpha(scpi_t* context) {
+    bool value = false;
+    
+    if(!SCPI_ParamBool(context, &value, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        spi0.set_cpha(value);
+    }
+    
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_spi_set_cpol(scpi_t* context) {
+    bool value = false;
+    
+    if(!SCPI_ParamBool(context, &value, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        spi0.set_cpol(value);
+    }
+    
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_spi_set_baud(scpi_t* context) {
+    float value = 1.0f;
+    
+    if(!SCPI_ParamFloat(context, &value, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        if(!spi0.set_baudrate(value)) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        }
+    }
+    
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_spi_get_baud(scpi_t* context) {
+    SCPI_ResultFloat(context, spi0.get_baudrate());
+    return SCPI_RES_OK;
+}
+
 //###########################################
 // SCPI callback definition
 //###########################################
@@ -162,12 +200,15 @@ scpi_command_t scpi_commands[] = {
     /* probeInterface */
     { .pattern = "ECHO", .callback = pi_echo,},
     { .pattern = "BOOTSEL", .callback = pi_bootsel,},
-	{ .pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
     
     { .pattern = "SPI:TRANSfer?", .callback = pi_spi_transfer,},
     { .pattern = "SPI[:PIN]:SCK", .callback = pi_spi_sck,},
     { .pattern = "SPI[:PIN]:MISO", .callback = pi_spi_miso,},
     { .pattern = "SPI[:PIN]:MOSI", .callback = pi_spi_mosi,},
+    { .pattern = "SPI:CPHA", .callback = pi_spi_set_cpha,},
+    { .pattern = "SPI:CPOL", .callback = pi_spi_set_cpol,},
+    { .pattern = "SPI:BAUDrate", .callback = pi_spi_set_baud,},
+    { .pattern = "SPI:BAUDrate?", .callback = pi_spi_get_baud,},
     
 	SCPI_CMD_LIST_END
 };

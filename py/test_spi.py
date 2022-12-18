@@ -20,6 +20,18 @@ inst.write("SPI:SCK 19")
 inst.write("SPI:MISO 18")
 inst.write("SPI:MOSI 18")
 
+inst.write("SPI:CPHA 0")
+assert(inst.query("SYST:ERR?").__contains__("No error"))
+
+inst.write("SPI:CPOL 0")
+assert(inst.query("SYST:ERR?").__contains__("No error"))
+
+baud = 20
+inst.write("SPI:BAUD " + str(baud))
+baudRead = float(inst.query("SPI:BAUD?"))
+assert(baud+0.01 > baudRead)
+assert(baud-0.01 < baudRead)
+
 transferLen = 8000
 spiTx = np.random.randint(0,255,transferLen)
 #print(spiTx)
