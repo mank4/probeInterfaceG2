@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "pico/stdlib.h"
+#include "pico/bootrom.h"
 #include "pio_spi.hpp"
 
 #include "scpi/scpi.h"
@@ -26,6 +27,7 @@ absolute_time_t scpi_doIndicatorPulseUntil;
 // SCPI callbacks
 //###########################################
 
+//we could add a second spi later so lets call it spi0
 pioSpi spi0;
 
 scpi_result_t DMM_MeasureVoltageDcQ(scpi_t * context) {
@@ -42,6 +44,12 @@ static scpi_result_t pi_echo(scpi_t* context) {
     }
     
     SCPI_ResultCharacters(context, retVal, text_len);
+    
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_bootsel(scpi_t* context) {
+    reset_usb_boot(PIN_LED, 0);
     
     return SCPI_RES_OK;
 }
@@ -66,6 +74,48 @@ static scpi_result_t pi_spi_transfer(scpi_t* context) {
         }       
     } else {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    }
+    
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_spi_sck(scpi_t* context) {
+    uint32_t value = 255;
+    
+    SCPI_ParamUInt32(context, &value, true);
+    
+    if(value < 0 || value > 28) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        spi0.set_sck_pin(value);
+    }
+    
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_spi_miso(scpi_t* context) {
+    uint32_t value = 255;
+    
+    SCPI_ParamUInt32(context, &value, true);
+    
+    if(value < 0 || value > 28) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        spi0.set_miso_pin(value);
+    }
+    
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_spi_mosi(scpi_t* context) {
+    uint32_t value = 255;
+    
+    SCPI_ParamUInt32(context, &value, true);
+    
+    if(value < 0 || value > 28) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        spi0.set_mosi_pin(value);
     }
     
     return SCPI_RES_OK;
@@ -111,8 +161,13 @@ scpi_command_t scpi_commands[] = {
     
     /* probeInterface */
     { .pattern = "ECHO", .callback = pi_echo,},
+    { .pattern = "BOOTSEL", .callback = pi_bootsel,},
 	{ .pattern = "MEASure:VOLTage:DC?", .callback = DMM_MeasureVoltageDcQ,},
+    
     { .pattern = "SPI:TRANSfer?", .callback = pi_spi_transfer,},
+    { .pattern = "SPI[:PIN]:SCK", .callback = pi_spi_sck,},
+    { .pattern = "SPI[:PIN]:MISO", .callback = pi_spi_miso,},
+    { .pattern = "SPI[:PIN]:MOSI", .callback = pi_spi_mosi,},
     
 	SCPI_CMD_LIST_END
 };
