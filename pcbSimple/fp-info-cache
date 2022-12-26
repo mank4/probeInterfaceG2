@@ -1,4 +1,4 @@
-20528253670204846
+20612202955723835
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -8007,13 +8007,6 @@ connector barrel jack
 0
 3
 3
-Connector_Card
-CF-Card_3M_N7E50-7516PK-20-WF
-Compact Flash Card connector (https://multimedia.3m.com/mws/media/22365O/3mtm-cf-card-header-compactflashtm-type-i-sm-ts0662.pdf)
-connector cf
-0
-54
-50
 Connector_Card
 CF-Card_3M_N7E50-A516xx-30
 Compact Flash Card connector, polarization inverse (https://multimedia.3m.com/mws/media/22424O/3mtm-cf-card-header-type-i-low-profile-surface-mount-ts0747.pdf)
@@ -50519,20 +50512,6 @@ Diode SOD923
 2
 2
 Diode_SMD
-D_SOT-23_ANK
-SOT-23, Single Diode
-SOT-23
-0
-3
-2
-Diode_SMD
-D_SOT-23_NKA
-SOT-23, Single Diode
-SOT-23
-0
-3
-2
-Diode_SMD
 D_TUMD2
 ROHM - TUMD2
 TUMD2
@@ -53075,13 +53054,6 @@ heatsink
 2
 Heatsink
 Heatsink_AAVID_TV5G_TO220_Horizontal
-Heatsink TV5G TO-220 Horizontal, https://www.shopaavid.com/Product/TV-5G
-Heatsink TV5G TO-220 Horizontal 
-0
-0
-0
-Heatsink
-Heatsink_Aavid-TV5G_TO220_Horizontal
 Heatsink TV5G TO-220 Horizontal, https://www.shopaavid.com/Product/TV-5G
 Heatsink TV5G TO-220 Horizontal 
 0
@@ -60830,13 +60802,6 @@ PhotoDiode plastic SMD DIL
 6
 2
 OptoDevice
-Osram_SMD-DIL2_4.5x4.0mm
-PhotoDiode, plastic SMD DIL, 4.5x4mm²
-PhotoDiode plastic SMD DIL
-0
-2
-2
-OptoDevice
 Osram_SMD-SmartDIL
 PhotoDiode, plastic SMD SmatDIL
 PhotoDiode plastic SMD SmatDIL
@@ -62796,13 +62761,6 @@ LFCSP-WD NoLead
 0
 24
 11
-Package_CSP
-Maxim_WLCSP-32_3.0x2.17mm_Layout7x5_P0.4mm_Ball0.27mm_Pad0.25mm
-WLCSP-32, 2.168x2.998mm, 35 Ball, 7x5 Layout, 0.4mm Pitch, https://pdfserv.maximintegrated.com/package_dwgs/21-100489.PDF
-CSP 35 0.4
-0
-35
-35
 Package_CSP
 Maxim_WLCSP-35_3.0x2.17mm_Layout7x5_P0.4mm_Ball0.27mm_Pad0.25mm
 WLCSP-35, 2.168x2.998mm, 35 Ball, 7x5 Layout, 0.4mm Pitch, https://pdfserv.maximintegrated.com/package_dwgs/21-100489.PDF
@@ -73073,20 +73031,6 @@ SOT-143 Reverse Handsoldering
 4
 4
 Package_TO_SOT_SMD
-SOT-143R_Reverse
-SOT-143R Reverse
-SOT-143R Reverse
-0
-4
-4
-Package_TO_SOT_SMD
-SOT-143R_Reverse_Handsoldering
-SOT-143R Reverse Handsoldering
-SOT-143 Reverse Handsoldering
-0
-4
-4
-Package_TO_SOT_SMD
 SOT-143_Handsoldering
 SOT-143 Handsoldering https://www.nxp.com/docs/en/package-information/SOT143B.pdf
 SOT-143 Handsoldering
@@ -76706,7 +76650,7 @@ Bluetooth Module
 30
 30
 RF_Module
-BM78SPPS5XC2
+BM78SPPS5xC2
 Bluetooth Dual-mode module with integral chip antenna (http://ww1.microchip.com/downloads/en/DeviceDoc/60001380C.pdf)
 Bluetooth BR/EDR BLE
 0
@@ -86197,3 +86141,423 @@ XQFN16
 0
 16
 16
+zz_Battery
+Battery_2PLPP503562S
+2400mAh Battery Pack (https://www.varta-storage.com/products/power/cellpac-lite/?lang=en)
+Varta Battery Lithium Li-ion
+0
+0
+0
+zz_Button_Switch_SMD
+DSPV03LSGET
+
+
+0
+6
+6
+zz_Button_Switch_THT
+Mini_Push_DPDT
+
+
+0
+6
+6
+zz_Button_Switch_THT
+Mini_Push_DPDT_SMD
+
+
+0
+12
+6
+zz_Button_Switch_THT
+SW_Push_SCI_R13-24
+
+250V
+0
+3
+2
+zz_Connector
+Flat_Plug_6.35
+Vogt 03866.A68
+flat plug 
+0
+2
+1
+zz_Connector
+pole_terminal_4mm_high
+
+
+0
+1
+1
+zz_Connector
+pole_terminal_4mm_low
+
+
+0
+1
+1
+zz_Connector_AC
+BKL 073374
+
+
+0
+3
+3
+zz_Connector_Audio
+CLIFF FC68127
+
+
+0
+8
+6
+zz_Connector_Audio
+CLIFF FC68127 SMD
+
+
+0
+8
+6
+zz_Connector_Audio
+CLIFF_FC68127_hybrid
+
+
+0
+8
+6
+zz_Connector_Audio
+XKB PJ-35372
+
+
+0
+10
+8
+zz_Connector_Audio
+XKB_PJ-35372_THT
+
+
+0
+10
+9
+zz_Connector_IDC
+IDC-Header_2x03_P2.54mm_Edge
+Harwin Male Horizontal Surface Mount Single Row 2.54mm (0.1 inch) Pitch PCB Connector, M20-89003xx, 3 Pins per row (https://cdn.harwin.com/pdfs/M20-890.pdf), generated with kicad-footprint-generator
+connector Harwin M20-890 horizontal
+0
+6
+6
+zz_Connector_IDC
+IDC-Header_2x07_P2.54mm_Edge
+Harwin Male Horizontal Surface Mount Single Row 2.54mm (0.1 inch) Pitch PCB Connector, M20-89007xx, 7 Pins per row (https://cdn.harwin.com/pdfs/M20-890.pdf), generated with kicad-footprint-generator
+connector Harwin M20-890 horizontal
+0
+14
+14
+zz_Connector_PinHeader_2.54mm
+PinHeader_1x02_P2.54mm_Edge
+Harwin Male Horizontal Surface Mount Single Row 2.54mm (0.1 inch) Pitch PCB Connector
+connector pin header edge
+0
+2
+2
+zz_Connector_PinHeader_2.54mm
+PinHeader_2x01_P2.54mm_Edge
+SMD pin header edge mount, 2x01, 2.54mm pitch, 6mm pin length
+SMD pin header THT 2x01 2.54mm
+0
+2
+2
+zz_Connector_USB
+USB_Mini-B_U-M-M5DD-W-1_Horizontal
+USB Mini-B 5-pin SMD connector, http://downloads.lumberg.com/datenblaetter/en/2486_01.pdf
+USB USB_B USB_Mini connector
+0
+9
+6
+zz_Connector_Wire
+SolderWirePad_1x01_SMD_2.54x5.08mm
+Wire Pad, Square, SMD Pad,  5mm x 10mm,
+MesurementPoint Square SMDPad 5mmx10mm 
+0
+1
+1
+zz_Converter_ACDC
+Converter_ACDC_MeanWell_IRM-60-xx_THT
+ACDC-Converter, 50-60W, Meanwell, IRM-60, THT https://www.meanwellusa.com/productPdf.aspx?i=687
+switching power supply
+0
+4
+4
+zz_Fuse
+Fuseholder_Cylinder-5x20mm6.3x32mm_Schurter_7510141
+
+Fuseholder 5x20 6.3x32
+0
+4
+2
+zz_Fuse
+Fuseholder_Cylinder-5x20mm_SMD
+
+Fuseholder 5x20
+0
+2
+2
+zz_Fuse
+Fuseholder_Cylinder-5x20mm_generic
+
+Fuseholder 5x20
+0
+4
+2
+zz_Heatsink
+Heatsink_15x13mm_TO220
+generic chinese
+Heatsink TO220
+0
+1
+1
+zz_Heatsink
+Heatsink_30x12mm_TO220_TC-V6560W-203
+
+TO220
+0
+2
+1
+zz_Heatsink
+Heatsink_38x27mm_Alutronic_FI356_TO220_Horizontal
+Heatsink TO-220 Horizontal FI356
+Heatsink TO-220 Horizontal FI356
+0
+0
+0
+zz_Inductor_SMD
+L_6x6-10x10
+Choke, SMD
+Choke SMD
+0
+2
+2
+zz_Inductor_SMD
+L_1008_2520Metric
+Inductor SMD 1008 (2520 Metric), square (rectangular) end terminal
+inductor
+0
+2
+2
+zz_Inductor_SMD
+L_Bourns-SRU1048_10.0x10.0mm
+Bourns SRU1028 series SMD inductor, https://www.bourns.com/docs/Product-Datasheets/SRU1028.pdf
+Bourns SRU1028 SMD inductor
+0
+2
+2
+zz_MCU_Module
+TI_LAUNCHXL_F28379D
+TI_Launchpad_Delphino
+
+0
+80
+80
+zz_Oscillator
+ASTXR-12-38.400MHz-514054-T
+https://abracon.com/Oscillators/ASTXR-12-38.400MHz-514054-T.pdf
+Oscillator TCXO
+0
+4
+4
+zz_Package_DFN_QFN
+QFN-20-1EP_3x3mm_P0.4mm_EP1.65x1.65mm_ThermalBigVias
+QFN, 20 Pin (https://www.analog.com/media/en/technical-documentation/data-sheets/3553fc.pdf#page=34), generated with kicad-footprint-generator ipc_noLead_generator.py
+QFN NoLead
+0
+30
+21
+zz_Package_DFN_QFN
+QFN-20-1EP_5x5mm_P0.8mm_EP2.7x2.7mm
+
+
+0
+21
+21
+zz_Package_DFN_QFN
+QFN-48-1EP_6x6mm_P0.4mm_EP4.2x4.2mm_ThermalBigVias
+QFN, 48 Pin (https://static.dev.sifive.com/SiFive-FE310-G000-datasheet-v1p5.pdf#page=20), generated with kicad-footprint-generator ipc_dfn_qfn_generator.py
+QFN DFN_QFN
+0
+91
+49
+zz_Package_DFN_QFN
+QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm_ThermalBigVias
+QFN, 48 Pin (http://www.st.com/resource/en/datasheet/stm32f042k6.pdf#page=94), generated with kicad-footprint-generator ipc_dfn_qfn_generator.py
+QFN DFN_QFN
+0
+91
+49
+zz_Package_DIP
+DIP-8_W8.89mm_DIPSocket_SMDMount
+8-lead though-hole mounted DIP package, row spacing 8.89 mm (350 mils), SMDSocket, LongPads
+THT DIP DIL PDIP 2.54mm 8.89mm 350mil SMDSocket LongPads
+0
+8
+8
+zz_Package_TO_SOT_THT
+TO-94
+TO-92Flat package, often used for hall sensors, drill 0.75mm (see e.g. http://www.ti.com/lit/ds/symlink/drv5023.pdf)
+to-92Flat hall sensor
+0
+4
+4
+zz_Package_TO_SOT_THT
+TO-220-3_Horizontal_TabUpScrewHole
+TO-220-3, Horizontal, RM 2.54mm, see https://www.vishay.com/docs/66542/to-220-1.pdf
+TO-220-3 Horizontal RM 2.54mm
+0
+3
+3
+zz_RF_Antenna
+Decawave_UWB_WB003
+
+
+0
+5
+2
+zz_RF_Antenna
+SiliconLabs_433MHz_WES0071-01-APF434M-01
+
+antenna
+0
+18
+2
+zz_RF_Antenna
+SiliconLabs_433MHz_WES0071-01-APF434M-01_x
+
+antenna
+0
+18
+2
+zz_RF_Antenna
+SiliconLabs_433MHz_WES0077-01-APN434D-01
+
+
+0
+1
+1
+zz_RF_Antenna
+SiliconLabs_433MHz_WES0077-01-APN434D-01_wide
+
+
+0
+1
+1
+zz_RF_Module
+FS1000A_SMD_vertical
+
+
+0
+6
+3
+zz_RF_Module
+FS1000A_vertical
+
+
+0
+3
+3
+zz_RF_Module
+MX-RM-5V_horizontal
+MX-RM-5V with coil loaded antenna, 0.6mm wire around 2.5mm core, 25cm wire, 17mm base, 16 turns
+MX-RM-5V 433MHz receiver
+0
+4
+4
+zz_RF_Module
+MX-RM-5V_horizontal_ANT
+MX-RM-5V with coil loaded antenna, 0.6mm wire around 2.5mm core, 25cm wire, 17mm base, 16 turns
+MX-RM-5V 433MHz receiver
+0
+5
+5
+zz_RF_Module
+MX-RM-5V_vertical
+
+MX-RM-5V 433MHz receiver
+0
+4
+4
+zz_RF_Module
+RXB6_SMD_vertical
+
+
+0
+16
+8
+zz_RF_Module
+RXB6_vertical
+
+
+0
+8
+8
+zz_Relay_THT
+Relay_DPDT_Fujitsu_FTR-B4
+
+
+0
+8
+8
+zz_Relay_THT
+Relay_SPDT_Fujitsu_FTR-K1CK
+
+
+0
+8
+5
+zz_Resistor_PCB
+R_PCB_50m
+
+
+0
+6
+6
+zz_Resistor_PCB
+R_PCB_50m_y
+
+y_mirror mirror
+0
+6
+6
+zz_Symbol
+Symbol_Polarity_Center_Positive
+Barrel connector polarity indicator
+barrel polarity
+0
+0
+0
+zz_Transformer_SMD
+HHM1595A1
+
+
+0
+6
+6
+zz_Transformer_THT
+Transformer_Block_EI42-5VA_1xSec
+Trafo, Printtrafo, Block, EI42, 5VA, 1x Sec,
+Trafo Printtrafo Block EI42 5VA 1x Sec 
+0
+10
+10
+zz_Transformer_THT
+Transformer_Block_EI48-10VA_1xSec
+Trafo, Printtrafo, Block, EI48, 10VA, 1x Sec
+Trafo Printtrafo Block EI48 10VA 1x Sec 
+0
+12
+12
+zz_case
+Hammond_1455K1202
+
+
+0
+14
+1
