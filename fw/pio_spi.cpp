@@ -7,6 +7,8 @@
 #include "pio_spi.hpp"
 #include "pio_spi.pio.h"
 
+#include "pico/stdlib.h"
+
 pioSpi::pioSpi(PIO pio, uint sm) : pio(pio), sm(sm) {
     cpha0_prog_offs = pio_add_program(pio, &spi_cpha0_program);
     cpha1_prog_offs = pio_add_program(pio, &spi_cpha1_program);
@@ -108,9 +110,13 @@ bool pioSpi::enable(bool on) {
         pio_spi_init(pio, sm, cpha ? cpha1_prog_offs : cpha0_prog_offs,
             8,       // 8 bits per SPI frame
             clkdiv, cpha, cpol, sck_pin, mosi_pin, miso_pin);
+        gpio_init(cs_pin);
+        gpio_put(cs_pin, 1);
+        gpio_set_dir(cs_pin, GPIO_OUT);
     } else {
         pio_sm_set_enabled(pio, sm, false);
-        pio_sm_set_pindirs_with_mask(pio, sm, 0, (1u << sck_pin) | (1u << mosi_pin) | (1u << miso_pin));
+        gpio_init_mask((1u << sck_pin) | (1u << mosi_pin) | (1u << miso_pin) | (1u << cs_pin));
+        //pio_sm_set_pindirs_with_mask(pio, sm, 0, (1u << sck_pin) | (1u << mosi_pin) | (1u << miso_pin));
     }
     isEnabled = on;
     return true;
@@ -130,6 +136,8 @@ void __time_critical_func(pioSpi::rw8_blocking)(uint8_t *src, uint8_t *dst, size
     // gets us the left-justification for free (for MSB-first shift-out)
     io_rw_8 *txfifo = (io_rw_8 *) &pio->txf[sm];
     io_rw_8 *rxfifo = (io_rw_8 *) &pio->rxf[sm];
+    gpio_put(cs_pin, 0);
+    sleep_us(2);
     while (tx_remain || rx_remain) { //this should be an ||
         if (tx_remain && !pio_sm_is_tx_fifo_full(pio, sm)) {
             *txfifo = *src++;
@@ -140,5 +148,7 @@ void __time_critical_func(pioSpi::rw8_blocking)(uint8_t *src, uint8_t *dst, size
             --rx_remain;
         }
     }
+    sleep_us(2);
+    gpio_put(cs_pin, 1);
 }
 

@@ -10,9 +10,10 @@
 
 #define PIN_LED 25
 
-#define PIN_SCK 18
-#define PIN_MOSI 16
-#define PIN_MISO 16 // same as MOSI, so we get loopback
+#define PIN_SCK 16
+#define PIN_MOSI 17
+#define PIN_MISO 18 // same as MOSI, so we get loopback
+#define PIN_CS 19
 
 #define SCPI_ERROR_QUEUE_SIZE 17
 scpi_error_t scpi_error_queue_data[SCPI_ERROR_QUEUE_SIZE];
@@ -116,6 +117,20 @@ static scpi_result_t pi_spi_mosi(scpi_t* context) {
     return SCPI_RES_OK;
 }
 
+static scpi_result_t pi_spi_cs(scpi_t* context) {
+    uint32_t value = 255;
+    
+    SCPI_ParamUInt32(context, &value, true);
+    
+    if(value < 0 || value > 28) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        spi0.set_cs_pin(value);
+    }
+    
+    return SCPI_RES_OK;
+}
+
 static scpi_result_t pi_spi_set_cpha(scpi_t* context) {
     bool value = false;
     
@@ -202,6 +217,7 @@ scpi_command_t scpi_commands[] = {
     { .pattern = "BOOTSEL", .callback = pi_bootsel,},
     
     { .pattern = "SPI:TRANSfer?", .callback = pi_spi_transfer,},
+    { .pattern = "SPI[:PIN]:CS", .callback = pi_spi_cs,},
     { .pattern = "SPI[:PIN]:SCK", .callback = pi_spi_sck,},
     { .pattern = "SPI[:PIN]:MISO", .callback = pi_spi_miso,},
     { .pattern = "SPI[:PIN]:MOSI", .callback = pi_spi_mosi,},
@@ -302,6 +318,7 @@ int main() {
     spi0.set_sck_pin(PIN_SCK);
     spi0.set_miso_pin(PIN_MISO);
     spi0.set_mosi_pin(PIN_MOSI);
+    spi0.set_cs_pin(PIN_CS);
     spi0.set_baudrate(5);
     spi0.set_cpha(0);
     spi0.set_cpol(0);
