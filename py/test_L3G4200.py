@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+%matplotlib qt5
 
 import pyvisa
 import time
@@ -38,7 +39,8 @@ plt.ion()
 fig = plt.figure()
 ax = fig.add_subplot(111)
 line1, = ax.plot(x,y,'b-')
-plt.ylim([-127, 128])
+plt.ylim([-32768, 32767])
+#plt.ylim([-2000, 2000])
 
 spiTx = np.array([0x20, 0x0f])
 #print(spiTx)
@@ -46,16 +48,15 @@ inst.write_binary_values("SPI:TRANS? ", spiTx, datatype='B')
 spiRx = inst.read_binary_values('B')
 
 while True:
-    spiTx = np.array([0x80 | 0x29, 0x00])
+    spiTx = np.array([0x80 | 0x40 | 0x29, 0x00, 0x00])
     #print(spiTx)
     inst.write_binary_values("SPI:TRANS? ", spiTx, datatype='B')
-    spiRx = inst.read_binary_values('b')
-    spiRx = np.asarray(spiRx)
+    spiRx = inst.read_binary_values('B')
+    spiRx = (-(spiRx[1] & 0x80) + (spiRx[1] & 0x7f))*256 + spiRx[2]
     #break
-    spiRx = spiRx[1]
     y = np.roll(y,-1)
     y[-1] = spiRx
-    print(y)
+    #print(y)
     line1.set_ydata(y)
     fig.canvas.draw()
     fig.canvas.flush_events()
