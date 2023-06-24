@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "HE3621A0500")(type "KiCad")(uri "${KIPRJMOD}/HE3621A0500.kicad_sym")(options "")(descr ""))
+  (lib (name "dcdcConverter")(type "KiCad")(uri "${KIPRJMOD}/../pcbLib/dcdcConverter.kicad_sym")(options "")(descr ""))
+)
