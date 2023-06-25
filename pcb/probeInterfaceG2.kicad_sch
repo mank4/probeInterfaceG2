@@ -8081,8 +8081,8 @@
     (pin "6" (uuid d969cbc2-3611-4634-8282-b6182f4f75a0))
     (pin "7" (uuid 31a52db0-d193-462d-9930-df76f12abece))
     (pin "8" (uuid 1087b391-fc1a-4750-bf1d-d13ad0b43820))
-    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1c))
-    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1c))
+    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1d))
+    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1d))
     (instances
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
@@ -8203,8 +8203,8 @@
     (pin "6" (uuid 7179ed5f-63d5-44bf-8032-8f596d37fbd9))
     (pin "7" (uuid 2cd7251c-3990-4d02-88cf-315e89db5efa))
     (pin "8" (uuid d89e5ee9-10a6-4c16-b6cf-a3db2f4ddf67))
-    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c1))
-    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c1))
+    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c2))
+    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c2))
     (instances
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
@@ -9204,7 +9204,7 @@
     (property "Value" "RP2040" (at 319.4559 165.1 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm_ThermalVias" (at 317.5 118.11 0)
+    (property "Footprint" "Package_DFN_QFN:QFN-56-1EP_7x7mm_P0.4mm_EP3.2x3.2mm" (at 317.5 118.11 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf" (at 317.5 118.11 0)
@@ -9445,8 +9445,8 @@
     (pin "6" (uuid 665f0e25-b5bb-4488-a6c1-9ac9fbc0f91a))
     (pin "7" (uuid d630e857-2b02-4bc6-9fa3-9483325f2403))
     (pin "8" (uuid a1abd104-c9ca-4393-b558-35d5cbfb3e85))
-    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec3))
-    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec3))
+    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec4))
+    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec4))
     (instances
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
