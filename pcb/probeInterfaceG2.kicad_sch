@@ -2792,6 +2792,9 @@
   (junction (at 64.77 34.29) (diameter 0) (color 0 0 0 0)
     (uuid 28b9ce20-508b-4398-a512-82022c0caaf0)
   )
+  (junction (at 354.33 280.67) (diameter 0) (color 0 0 0 0)
+    (uuid 28c69c89-9205-4c1c-bd7e-4531bc09e6c6)
+  )
   (junction (at 480.06 209.55) (diameter 0) (color 0 0 0 0)
     (uuid 298556e0-27f2-4ae3-a6b7-6a51d0c64541)
   )
@@ -3796,6 +3799,10 @@
     (stroke (width 0) (type default))
     (uuid 56635ee6-2638-483f-b87a-b81284fd7e08)
   )
+  (wire (pts (xy 364.49 288.29) (xy 364.49 289.56))
+    (stroke (width 0) (type default))
+    (uuid 56bd0c36-7b85-4528-b52f-50931def3def)
+  )
   (wire (pts (xy 336.55 40.64) (xy 336.55 39.37))
     (stroke (width 0) (type default))
     (uuid 56c8b2d9-e07f-4eb1-af08-bf91883b5b4c)
@@ -4752,6 +4759,10 @@
     (stroke (width 0) (type default))
     (uuid b12fd753-265a-4891-8807-b5270523aee5)
   )
+  (wire (pts (xy 354.33 280.67) (xy 364.49 280.67))
+    (stroke (width 0) (type default))
+    (uuid b2908847-d9c6-425c-a45f-d2e0db373a17)
+  )
   (wire (pts (xy 210.82 246.38) (xy 210.82 247.65))
     (stroke (width 0) (type default))
     (uuid b351ba92-67e8-4623-a7d0-1eb3ab8dc737)
@@ -5088,7 +5099,7 @@
     (stroke (width 0) (type default))
     (uuid da780603-da2e-419f-bd12-48f893793107)
   )
-  (wire (pts (xy 354.33 279.4) (xy 354.33 293.37))
+  (wire (pts (xy 354.33 279.4) (xy 354.33 280.67))
     (stroke (width 0) (type default))
     (uuid da8f727a-4267-4424-932e-183139dae748)
   )
@@ -5303,6 +5314,10 @@
   (wire (pts (xy 482.6 336.55) (xy 482.6 340.36))
     (stroke (width 0) (type default))
     (uuid ee323893-34dc-4dca-9fc7-2d55316a5f1a)
+  )
+  (wire (pts (xy 354.33 280.67) (xy 354.33 293.37))
+    (stroke (width 0) (type default))
+    (uuid ee4641ef-00bb-438a-b23b-0e1f6fa05385)
   )
   (wire (pts (xy 66.04 275.59) (xy 66.04 276.86))
     (stroke (width 0) (type default))
@@ -8066,8 +8081,8 @@
     (pin "6" (uuid d969cbc2-3611-4634-8282-b6182f4f75a0))
     (pin "7" (uuid 31a52db0-d193-462d-9930-df76f12abece))
     (pin "8" (uuid 1087b391-fc1a-4750-bf1d-d13ad0b43820))
-    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1b))
-    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1b))
+    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1c))
+    (pin "9" (uuid 0a905204-a905-471b-9926-5d563e1c8c1c))
     (instances
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
@@ -8188,8 +8203,8 @@
     (pin "6" (uuid 7179ed5f-63d5-44bf-8032-8f596d37fbd9))
     (pin "7" (uuid 2cd7251c-3990-4d02-88cf-315e89db5efa))
     (pin "8" (uuid d89e5ee9-10a6-4c16-b6cf-a3db2f4ddf67))
-    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c0))
-    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c0))
+    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c1))
+    (pin "9" (uuid 2911a47f-ae55-46c8-903e-58d1644091c1))
     (instances
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
@@ -8301,6 +8316,31 @@
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
           (reference "R8") (unit 1)
+        )
+      )
+    )
+  )
+
+  (symbol (lib_id "power:GND") (at 364.49 289.56 0) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 3daef40a-002c-42e5-8cd6-6eed07f1cc9f)
+    (property "Reference" "#PWR0128" (at 364.49 295.91 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Value" "GND" (at 360.68 290.83 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Footprint" "" (at 364.49 289.56 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "" (at 364.49 289.56 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 980a8ace-dd8d-4539-8f82-9c62a57f9ac2))
+    (instances
+      (project "probeInterfaceG2"
+        (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
+          (reference "#PWR0128") (unit 1)
         )
       )
     )
@@ -9405,8 +9445,8 @@
     (pin "6" (uuid 665f0e25-b5bb-4488-a6c1-9ac9fbc0f91a))
     (pin "7" (uuid d630e857-2b02-4bc6-9fa3-9483325f2403))
     (pin "8" (uuid a1abd104-c9ca-4393-b558-35d5cbfb3e85))
-    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec2))
-    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec2))
+    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec3))
+    (pin "9" (uuid 7f5e2fa6-1a5e-4e1d-ac57-6ae08539dec3))
     (instances
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
@@ -10197,6 +10237,32 @@
       (project "probeInterfaceG2"
         (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
           (reference "R28") (unit 1)
+        )
+      )
+    )
+  )
+
+  (symbol (lib_id "Device:C") (at 364.49 284.48 0) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid a5bed5cf-e863-494d-95e0-d0721147387f)
+    (property "Reference" "C48" (at 367.411 283.3116 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "10u" (at 367.411 285.623 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "Capacitor_SMD:C_0805_2012Metric" (at 365.4552 288.29 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "~" (at 364.49 284.48 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid d32fcaab-fc75-463e-8c49-ad609028b333))
+    (pin "2" (uuid 33cdff93-1c06-4126-983a-3cfcfb3791f1))
+    (instances
+      (project "probeInterfaceG2"
+        (path "/6ffd737b-9cf1-4f67-98df-7cc1cbeaaab7"
+          (reference "C48") (unit 1)
         )
       )
     )
