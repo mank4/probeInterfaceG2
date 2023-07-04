@@ -7,7 +7,9 @@ import numpy as np
 import time
 
 rm = pyvisa.ResourceManager()
-reslist = rm.list_resources("USB?::5824::?*::INSTR")
+#print(rm.list_resources())
+#reslist = rm.list_resources("USB?::5824::?*::INSTR")
+reslist = rm.list_resources("USB?::0x16C0::?*::INSTR")
 print(reslist)
 
 if (len(reslist) == 0):
@@ -16,9 +18,9 @@ if (len(reslist) == 0):
 inst = rm.open_resource(reslist[0]);
 inst.timeout = 3000 
 
-inst.write("SPI:SCK 19")
-inst.write("SPI:MISO 18")
-inst.write("SPI:MOSI 18")
+inst.write("SPI:SCK 0")
+inst.write("SPI:MISO 3")
+inst.write("SPI:MOSI 1")
 
 inst.write("SPI:CPHA 0")
 assert(inst.query("SYST:ERR?").__contains__("No error"))
@@ -26,13 +28,13 @@ assert(inst.query("SYST:ERR?").__contains__("No error"))
 inst.write("SPI:CPOL 0")
 assert(inst.query("SYST:ERR?").__contains__("No error"))
 
-baud = 20
+baud =6
 inst.write("SPI:BAUD " + str(baud))
 baudRead = float(inst.query("SPI:BAUD?"))
 assert(baud+0.01 > baudRead)
 assert(baud-0.01 < baudRead)
 
-transferLen = 8000
+transferLen = 100
 spiTx = np.random.randint(0,255,transferLen)
 #print(spiTx)
 watch = time.perf_counter()

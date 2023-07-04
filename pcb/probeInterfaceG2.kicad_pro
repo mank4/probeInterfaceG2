@@ -97,7 +97,7 @@
         "silk_over_copper": "warning",
         "silk_overlap": "warning",
         "skew_out_of_range": "error",
-        "solder_mask_bridge": "warning",
+        "solder_mask_bridge": "error",
         "starved_thermal": "error",
         "text_height": "warning",
         "text_thickness": "warning",
@@ -129,7 +129,7 @@
         "min_through_hole_diameter": 0.3,
         "min_track_width": 0.15,
         "min_via_annular_width": 0.19999999999999998,
-        "min_via_diameter": 0.0,
+        "min_via_diameter": 0.39999999999999997,
         "solder_mask_to_copper_clearance": 0.0,
         "use_height_for_length_calcs": true
       },
@@ -402,7 +402,7 @@
       "pin_to_pin": "warning",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
-      "simulation_model_issue": "ignore",
+      "simulation_model_issue": "error",
       "unannotated": "error",
       "unit_value_mismatch": "error",
       "unresolved_variable": "error",
@@ -459,24 +459,7 @@
     },
     "net_colors": null,
     "netclass_assignments": null,
-    "netclass_patterns": [
-      {
-        "netclass": "USB_DIFF_90",
-        "pattern": "/USB_D+"
-      },
-      {
-        "netclass": "USB_DIFF_90",
-        "pattern": "/USB_D-"
-      },
-      {
-        "netclass": "USB_DIFF_90",
-        "pattern": "/USBi_D+"
-      },
-      {
-        "netclass": "USB_DIFF_90",
-        "pattern": "/USBi_D-"
-      }
-    ]
+    "netclass_patterns": []
   },
   "pcbnew": {
     "last_paths": {
