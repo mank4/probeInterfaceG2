@@ -17,7 +17,10 @@ probeInterfaceG2 is under development. Firmware features usbtmc, scpi parser and
 
 Clone probeInterfaceG2 next to pico folder containing pico-examples, pico-sdk and picotool.
 
+- Install WSL / Ubuntu on Windows, run `sudo apt update`
+- Make sure the following packages exist: cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib git build-essential
 - Clone dependencies: `git submodule init` and `git submodule update`
+- Clone the pico sdk and update submodules if requested
 - Create build folder in firmware and cd into. `cd fw && mkdir build && cd build`
 - Then run `export PICO_SDK_PATH=../../../pico/pico-sdk` and `cmake ..`
 - Then `make -j4`
