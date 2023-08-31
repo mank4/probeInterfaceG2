@@ -8,12 +8,113 @@
 #include "scpi/scpi.h"
 #include "usbtmc_app.h"
 
-#define PIN_LED 25
+//red led
+#define PIN_LED1 28
+//green led
+#define PIN_LED2 27
 
-#define PIN_SCK 16
-#define PIN_MOSI 17
-#define PIN_MISO 18 // same as MOSI, so we get loopback
-#define PIN_CS 19
+#define PIN_REG_CLK 26
+#define PIN_REG_DATA 24
+#define PIN_REG_LATCH 25
+
+#define PIN_SCK 1
+#define PIN_MOSI 2
+#define PIN_MISO 2 // same as MOSI, so we get loopback
+#define PIN_CS 3
+
+//waste index 0 to avoid -1 at every access
+const uint8_t PIN_PP[] = {42, 21, 20, 19, 18, 13, 12, 11, 10, 5, 4, 3, 2};
+const uint8_t PIN_PP_DIR[] = {42, 23, 22, 17, 16, 15, 14, 9, 8, 7, 6, 1, 0};
+const uint8_t PIN_PP_SW[] = {42, 8, 9, 7, 10, 6, 11, 0, 5, 1, 4, 2, 3};
+
+//value of register that is shifted out to the 74hc595s
+static uint32_t shiftregValue = 0;
+
+//we could add a second spi later so lets call it spi0
+pioSpi spi0;
+
+
+// --- shift register functions (dac and relays) ---
+
+void shiftreg_write(uint32_t shiftData) {
+    for (int i = 0; i < 24; i++) {      //loop that runs for 24 bits
+        gpio_put(PIN_REG_CLK, 0);
+        gpio_put(PIN_REG_DATA, shiftData & 0x1);
+        shiftData >>= 1;
+        sleep_us(5);
+        gpio_put(PIN_REG_CLK, 1);
+        sleep_us(5);
+    }
+    gpio_put(PIN_REG_CLK, 0);
+
+    gpio_put(PIN_REG_LATCH, 1);
+    sleep_us(5);
+    gpio_put(PIN_REG_LATCH, 0);
+}
+
+void dac_set(float dacVoltage) {
+    uint16_t dacValue = dacVoltage * 4095.0f / 3.3f;
+    if(dacValue & 0xf000)
+        dacValue = 0x0fff;
+    shiftregValue = (dacValue << 12) | (shiftregValue & 0xfff);
+    shiftreg_write(shiftregValue);
+}
+
+void relay_set(uint8_t ppPin, bool close) {
+    shiftregValue = shiftregValue & ~(1 << PIN_PP_SW[ppPin]);
+    if(close)
+        shiftregValue = shiftregValue | (1 << PIN_PP_SW[ppPin]);
+    shiftreg_write(shiftregValue);
+    sleep_us(999);
+}
+
+// --- pp gpio functions ---
+
+void pp_gpio_dirShifter(uint8_t ppPin, bool out) {
+    gpio_init(PIN_PP_DIR[ppPin]);
+    gpio_set_dir(PIN_PP_DIR[ppPin], GPIO_OUT);
+    gpio_put(PIN_PP_DIR[ppPin], out);
+}
+
+void pp_gpio_dirOut(uint8_t ppPin) {
+    gpio_init(PIN_PP[ppPin]);
+    pp_gpio_dirShifter(ppPin, true);
+    gpio_set_dir(PIN_PP[ppPin], GPIO_OUT);
+    gpio_put(PIN_PP[ppPin], false);
+}
+
+void pp_gpio_dirIn(uint8_t ppPin) {
+    gpio_init(PIN_PP[ppPin]);
+    gpio_set_dir(PIN_PP[ppPin], GPIO_IN);
+    pp_gpio_dirShifter(PIN_PP[ppPin], false);
+}
+
+void pp_gpio_write(uint8_t ppPin, bool high) {
+    gpio_put(PIN_PP[ppPin], high);
+}
+
+bool pp_gpio_read(uint8_t ppPin) {
+    return gpio_get(PIN_PP[ppPin]);
+}
+
+void pp_gpio_reset(void) {
+    spi0.set_sck_pin(0);
+    spi0.set_miso_pin(0);
+    spi0.set_mosi_pin(0);
+    spi0.set_cs_pin(0);
+    spi0.set_baudrate(1);
+    spi0.set_cpha(0);
+    spi0.set_cpol(0);
+
+    for(uint8_t i = 0; i <= 12; i++) {
+        pp_gpio_dirIn(i);
+        relay_set(i, 0);
+    }
+}
+
+//###########################################
+// SCPI
+//###########################################
 
 #define SCPI_ERROR_QUEUE_SIZE 17
 scpi_error_t scpi_error_queue_data[SCPI_ERROR_QUEUE_SIZE];
@@ -27,9 +128,6 @@ absolute_time_t scpi_doIndicatorPulseUntil;
 //###########################################
 // SCPI callbacks
 //###########################################
-
-//we could add a second spi later so lets call it spi0
-pioSpi spi0;
 
 static scpi_result_t pi_echo(scpi_t* context) {
     char retVal[500] = "hm";
@@ -45,10 +143,12 @@ static scpi_result_t pi_echo(scpi_t* context) {
 }
 
 static scpi_result_t pi_bootsel(scpi_t* context) {
-    reset_usb_boot(PIN_LED, 0);
+    reset_usb_boot(PIN_LED1, 0);
     
     return SCPI_RES_OK;
 }
+
+// --- SPI callbacks ---
 
 //syntax is #<num of byte digits><num of bytes><data>
 //e.g. #18abcdefgh
@@ -70,62 +170,6 @@ static scpi_result_t pi_spi_transfer(scpi_t* context) {
         }       
     } else {
         SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-    }
-    
-    return SCPI_RES_OK;
-}
-
-static scpi_result_t pi_spi_sck(scpi_t* context) {
-    uint32_t value = 255;
-    
-    SCPI_ParamUInt32(context, &value, true);
-    
-    if(value < 0 || value > 28) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-    } else {
-        spi0.set_sck_pin(value);
-    }
-    
-    return SCPI_RES_OK;
-}
-
-static scpi_result_t pi_spi_miso(scpi_t* context) {
-    uint32_t value = 255;
-    
-    SCPI_ParamUInt32(context, &value, true);
-    
-    if(value < 0 || value > 28) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-    } else {
-        spi0.set_miso_pin(value);
-    }
-    
-    return SCPI_RES_OK;
-}
-
-static scpi_result_t pi_spi_mosi(scpi_t* context) {
-    uint32_t value = 255;
-    
-    SCPI_ParamUInt32(context, &value, true);
-    
-    if(value < 0 || value > 28) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-    } else {
-        spi0.set_mosi_pin(value);
-    }
-    
-    return SCPI_RES_OK;
-}
-
-static scpi_result_t pi_spi_cs(scpi_t* context) {
-    uint32_t value = 255;
-    
-    SCPI_ParamUInt32(context, &value, true);
-    
-    if(value < 0 || value > 28) {
-        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
-    } else {
-        spi0.set_cs_pin(value);
     }
     
     return SCPI_RES_OK;
@@ -169,9 +213,109 @@ static scpi_result_t pi_spi_set_baud(scpi_t* context) {
     return SCPI_RES_OK;
 }
 
+static scpi_result_t pi_io_level(scpi_t* context) {
+    float value = 1.0f;
+
+    if(!SCPI_ParamFloat(context, &value, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        if(value < 0.0f || value > 3.3f) {
+            SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+        } else {
+            dac_set(value);
+        }
+    }
+
+    return SCPI_RES_OK;
+}
+
 static scpi_result_t pi_spi_get_baud(scpi_t* context) {
     SCPI_ResultFloat(context, spi0.get_baudrate());
     return SCPI_RES_OK;
+}
+
+scpi_choice_def_t pi_io_funcdef[] = {
+    {"IN", 1},
+    {"OUT", 2},
+    {"CS", 3},
+    {"SCK", 4},
+    {"MISO", 5},
+    {"MOSI", 6},
+    SCPI_CHOICE_LIST_END
+};
+
+static scpi_result_t pi_io_func(scpi_t* context) {
+    int32_t ppPin = 0;
+    SCPI_CommandNumbers(context, &ppPin, 1, 0);
+
+    int32_t choice = 0;
+    if(ppPin < 1 || ppPin > 12 || !SCPI_ParamChoice(context, pi_io_funcdef, &choice, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        switch(choice) {
+            case 1:
+                pp_gpio_dirIn(ppPin);
+                break;
+            case 2:
+                pp_gpio_dirOut(ppPin);
+                break;
+            case 3:
+                pp_gpio_dirShifter(ppPin, true);
+                spi0.set_cs_pin(PIN_PP[ppPin]);
+                break;
+            case 4:
+                pp_gpio_dirShifter(ppPin, true);
+                spi0.set_sck_pin(PIN_PP[ppPin]);
+                break;
+            case 5:
+                pp_gpio_dirShifter(ppPin, false);
+                spi0.set_miso_pin(PIN_PP[ppPin]);
+                break;
+            case 6:
+                pp_gpio_dirShifter(ppPin, true);
+                spi0.set_mosi_pin(PIN_PP[ppPin]);
+                break;
+        }
+    }
+
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_io_enable(scpi_t* context) {
+    int32_t ppPin = 0;
+    SCPI_CommandNumbers(context, &ppPin, 1, 0);
+
+    bool on = false;
+    if(ppPin < 1 || ppPin > 12 || !SCPI_ParamBool(context, &on, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        relay_set(ppPin, on);
+    }
+
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_io_write(scpi_t* context) {
+    int32_t ppPin = 0;
+    SCPI_CommandNumbers(context, &ppPin, 1, 0);
+
+    bool on = false;
+    if(ppPin < 1 || ppPin > 12 || !SCPI_ParamBool(context, &on, true)) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        pp_gpio_write(ppPin, on);
+    }
+
+    return SCPI_RES_OK;
+}
+
+static scpi_result_t pi_io_read(scpi_t* context) {
+    return SCPI_RES_OK;
+}
+
+scpi_result_t pi_reset(scpi_t * context) {
+    pp_gpio_reset();
+    return SCPI_CoreRst(context);
 }
 
 //###########################################
@@ -187,7 +331,8 @@ scpi_command_t scpi_commands[] = {
     {"*IDN?", SCPI_CoreIdnQ, 0},
     {"*OPC", SCPI_CoreOpc, 0},
     {"*OPC?", SCPI_CoreOpcQ, 0},
-    {"*RST", SCPI_CoreRst, 0},
+    //{"*RST", SCPI_CoreRst, 0},
+    {"*RST", .callback = pi_reset,},
     {"*SRE", SCPI_CoreSre, 0},
     {"*SRE?", SCPI_CoreSreQ, 0},
     {"*STB?", SCPI_CoreStbQ, 0},
@@ -215,12 +360,15 @@ scpi_command_t scpi_commands[] = {
     /* probeInterface */
     { .pattern = "ECHO", .callback = pi_echo,},
     { .pattern = "BOOTSEL", .callback = pi_bootsel,},
-    
+
+    { .pattern = "IO:LEVel", .callback = pi_io_level,},
+
+    { .pattern = "IO#:FUnc", .callback = pi_io_func,},
+    { .pattern = "IO#:ENable", .callback = pi_io_enable,},
+    { .pattern = "IO#:WRite", .callback = pi_io_write,},
+    { .pattern = "IO#:REad", .callback = pi_io_read,},
+
     { .pattern = "SPI:TRANSfer?", .callback = pi_spi_transfer,},
-    { .pattern = "SPI[:PIN]:CS", .callback = pi_spi_cs,},
-    { .pattern = "SPI[:PIN]:SCK", .callback = pi_spi_sck,},
-    { .pattern = "SPI[:PIN]:MISO", .callback = pi_spi_miso,},
-    { .pattern = "SPI[:PIN]:MOSI", .callback = pi_spi_mosi,},
     { .pattern = "SPI:CPHA", .callback = pi_spi_set_cpha,},
     { .pattern = "SPI:CPOL", .callback = pi_spi_set_cpol,},
     { .pattern = "SPI:BAUDrate", .callback = pi_spi_set_baud,},
@@ -295,7 +443,7 @@ void usbtmc_app_clear_srq_cb(void)
 //indicator light is required by IEEE 488.2
 void usbtmc_app_indicator_cb(void)
 {
-    gpio_put(PIN_LED, 1);
+    gpio_put(PIN_LED2, 1);
     scpi_doIndicatorPulse = true;
     scpi_doIndicatorPulseUntil = make_timeout_time_ms(750);
 }
@@ -307,21 +455,27 @@ void usbtmc_app_indicator_cb(void)
 int main() {
     stdio_init_all();
     
-    gpio_init(PIN_LED);
-    gpio_set_dir(PIN_LED, GPIO_OUT);
-    gpio_put(PIN_LED, 1);
+    //init pins for LEDs
+    gpio_init(PIN_LED1);
+    gpio_init(PIN_LED2);
+    gpio_set_dir(PIN_LED1, GPIO_OUT);
+    gpio_set_dir(PIN_LED2, GPIO_OUT);
+    gpio_put(PIN_LED1, 1);
     //printf("RP2040 booting...\n");
     sleep_ms(1000);
-    gpio_put(PIN_LED, 0);
+    gpio_put(PIN_LED1, 0);
+
+    //init pins for shift register
+    gpio_init(PIN_REG_CLK);
+    gpio_init(PIN_REG_DATA);
+    gpio_init(PIN_REG_LATCH);
+    gpio_set_dir(PIN_REG_CLK, GPIO_OUT);
+    gpio_set_dir(PIN_REG_DATA, GPIO_OUT);
+    gpio_set_dir(PIN_REG_LATCH, GPIO_OUT);
         
     //pioSpi spi0; //we need this global
-    spi0.set_sck_pin(PIN_SCK);
-    spi0.set_miso_pin(PIN_MISO);
-    spi0.set_mosi_pin(PIN_MOSI);
-    spi0.set_cs_pin(PIN_CS);
-    spi0.set_baudrate(5);
-    spi0.set_cpha(0);
-    spi0.set_cpol(0);
+
+    pp_gpio_reset();
     
     SCPI_Init(&scpi_context,
               scpi_commands,
@@ -333,11 +487,33 @@ int main() {
     );
     
     usbtmc_app_init();
-    
-    while (true) {
+
+    //test relays - turn on one and another
+    //uint8_t i = 1;
+    //while(i <= 12) {
+    //    relay_set(i, 1);
+    //    i += 1;
+    //    sleep_ms(5000);
+    //}
+
+    //dac test - generate triangle
+    //float dacVolt = 0;
+    //while(true){
+    //    dacVolt = dacVolt + 0.01f;
+    //    if(dacVolt > 1.65)
+    //        gpio_put(PIN_LED1, 0);
+    //    if(dacVolt > 3.3) {
+    //        dacVolt = 0.0f;
+    //        gpio_put(PIN_LED1, 1);
+    //    }
+    //    dac_set(dacVolt);
+    //    sleep_ms(10);
+    //}
+
+    while(true) {
         if(scpi_doIndicatorPulse && get_absolute_time() > scpi_doIndicatorPulseUntil) {
             scpi_doIndicatorPulse = false;
-            gpio_put(PIN_LED, 0);
+            gpio_put(PIN_LED2, 0);
         }
         
         usbtmc_app_task_iter();

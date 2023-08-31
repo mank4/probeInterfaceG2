@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name "levelShifter")(type "KiCad")(uri "${KIPRJMOD}/../pcbLib/levelShifter.kicad_sym")(options "")(descr ""))
-)
