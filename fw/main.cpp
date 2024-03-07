@@ -86,7 +86,7 @@ void pp_gpio_dirOut(uint8_t ppPin) {
 void pp_gpio_dirIn(uint8_t ppPin) {
     gpio_init(PIN_PP[ppPin]);
     gpio_set_dir(PIN_PP[ppPin], GPIO_IN);
-    pp_gpio_dirShifter(PIN_PP[ppPin], false);
+    pp_gpio_dirShifter(ppPin, false);
 }
 
 void pp_gpio_write(uint8_t ppPin, bool high) {
@@ -94,7 +94,7 @@ void pp_gpio_write(uint8_t ppPin, bool high) {
 }
 
 bool pp_gpio_read(uint8_t ppPin) {
-    return gpio_get(PIN_PP[ppPin]);
+    return (gpio_get(PIN_PP[ppPin]) != 0);
 }
 
 void pp_gpio_reset(void) {
