@@ -5,6 +5,8 @@ Currently the following interfaces are supported:
 - GPIO
 - SPI
 
+(C) Manuel Koch, Lehrstuhl für Technische Elektronik
+
 probeInterfaceG2 uses
 - [tinyusb](https://github.com/hathach/tinyusb)
 - [scpi-parser](https://github.com/j123b567/scpi-parser)
