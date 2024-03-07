@@ -310,6 +310,16 @@ static scpi_result_t pi_io_write(scpi_t* context) {
 }
 
 static scpi_result_t pi_io_read(scpi_t* context) {
+    int32_t ppPin = 0;
+    SCPI_CommandNumbers(context, &ppPin, 1, 0);
+
+    if(ppPin < 1 || ppPin > 12) {
+        SCPI_ErrorPush(context, SCPI_ERROR_ILLEGAL_PARAMETER_VALUE);
+    } else {
+        bool level = pp_gpio_read(ppPin);
+        SCPI_ResultBool(context, level);
+    }
+
     return SCPI_RES_OK;
 }
 
