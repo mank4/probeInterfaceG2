@@ -1,12 +1,12 @@
 # probeInterfaceG2
 
-probeInterfaceG2 is an USB controlled interface box for transmission and reception of digital signals on 12-pins of a 14-pin flat band cable. The pin number layout is common with [GGB Picoprobe multi-contact wedge probes](https://ggb.com/home/multi-contact-wedges/). It features galvanically isolated USB for control, adjustable logic levels from 0.65 to 3.3 V and relays for disabling unused pins. The device is controlled via IEEE 488.2 compatible SCPI commands.
+probeInterfaceG2 is a USB controlled interface box for transmission and reception of digital signals on 12-pins of a 14-pin flat band cable. The pin number layout is common with [GGB Picoprobe multi-contact wedge probes](https://ggb.com/home/multi-contact-wedges/). It features galvanically isolated USB for control, adjustable logic levels from 0.65 to 3.3 V and relays for disabling unused pins. The device is controlled via IEEE 488.2 compatible SCPI commands.
 
 Currently the following interfaces are supported:
 - GPIO
 - SPI
 
-probeInterfaceG2 is licensed under GPL v3, except for the case's 3D model file which is (c) Hammond Manufacturing Ltd., originally obtained from https://www.hammfg.com/electronics/small-case/extruded/1455#product-tables.
+probeInterfaceG2 is licensed under GPL v3. As the case's 3D model is assumed to be (c) Hammond Manufacturing Ltd., originally obtained from https://www.hammfg.com/electronics/small-case/extruded/1455#product-tables, a script is included to download the model.
 
 probeInterfaceG2 uses
 - [tinyusb](https://github.com/hathach/tinyusb)
