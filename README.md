@@ -137,3 +137,8 @@ For programming hints see the [Getting started](https://datasheets.raspberrypi.c
   - [tinyusb for usbtmc](https://github.com/hathach/tinyusb), [example](https://github.com/markb139/pico_logic)
 - Ethernet
   - Wiznet w5500 [eval](https://www.wiznet.io/product-item/w5500-evb-pico/) [doc](https://docs.wiznet.io/Product/iEthernet/W5500/w5500-evb-pico)
+
+  
+## Acknowledgement
+
+The financial support by the Federal Ministry of Education and Research of Germany in the project "Open6GHub" (grant number: 16KISK005) is acknowledged.
