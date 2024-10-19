@@ -1,11 +1,12 @@
 # probeInterfaceG2
 
-probeInterfaceG2 is in beta state. It is an interface box for sending digital signals on 12 pins on a flat band cable compatible with PicoProbes DC probes. It features galvanically isolated USB for control, adjustable logic levels from 0.65 to 3.3 V and relays for disabling unused pins. The device is controlled via IEEE 488.2 compatible SCPI commands.
+probeInterfaceG2 is an USB controlled interface box for transmission and reception of digital signals on 12-pins of a 14-pin flat band cable. The pin number layout is common with [GGB Picoprobe multi-contact wedge probes](https://ggb.com/home/multi-contact-wedges/). It features galvanically isolated USB for control, adjustable logic levels from 0.65 to 3.3 V and relays for disabling unused pins. The device is controlled via IEEE 488.2 compatible SCPI commands.
+
 Currently the following interfaces are supported:
 - GPIO
 - SPI
 
-(C) Manuel Koch, Lehrstuhl für Technische Elektronik
+probeInterfaceG2 is licensed under GPL v3, except for the case's 3D model file which is (c) Hammond Manufacturing Ltd., originally obtained from https://www.hammfg.com/electronics/small-case/extruded/1455#product-tables.
 
 probeInterfaceG2 uses
 - [tinyusb](https://github.com/hathach/tinyusb)
@@ -22,7 +23,7 @@ probeInterfaceG2 uses
 
 ## SCPI commands
 
-Pin numbering is based on PicoProbes numbering scheme.
+Pin numbering is based on [GGB Picoprobe multi-contact wedge probes](https://ggb.com/home/multi-contact-wedges/) numbering scheme.
 
 __*IDN?__
 
@@ -119,6 +120,7 @@ For programming hints see the [Getting started](https://datasheets.raspberrypi.c
 
 ## Possible improvements
 
+- Better 3.3 V overvoltage protection circuit currently realized using X0202NN
 - Ethernet interface VXI11
 - Integrated power supply for DUT, with high precision measurement functions and grounding feature
 
