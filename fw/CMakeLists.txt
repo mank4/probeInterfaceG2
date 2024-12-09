@@ -32,7 +32,7 @@ add_library(usbinst STATIC
         ${USB_SRC_PATH}/usbtmc_app.c
 )
 target_include_directories(usbinst PUBLIC "usb")
-target_link_libraries(usbinst PUBLIC pico_stdlib tinyusb_board tinyusb_device)
+target_link_libraries(usbinst PUBLIC pico_stdlib pico_unique_id tinyusb_board tinyusb_device)
 
 #Build main file
 pico_generate_pio_header(probeInterfaceG2 ${CMAKE_CURRENT_LIST_DIR}/pio_spi.pio)

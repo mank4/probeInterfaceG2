@@ -26,6 +26,7 @@
 #include "tusb.h"
 #include "class/usbtmc/usbtmc.h"
 #include "class/usbtmc/usbtmc_device.h"
+#include "pico/unique_id.h"
 
 
 /* A combination of interfaces must have a unique product id, since PC will save device driver after the first plug.
@@ -192,7 +193,7 @@ char const* string_desc_arr [] =
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
   "LTE",                        // 1: Manufacturer
   "probeInterfaceG2",           // 2: Product
-  "dev",                        // 3: Serials, should use chip ID
+  NULL,                        // 3: Serials, should use chip ID
   "IEEE 488.2 usbtmc",             // 4: USBTMC
 };
 
@@ -210,6 +211,17 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
   {
     memcpy(&_desc_str[1], string_desc_arr[0], 2);
     chr_count = 1;
+  }
+  if (index == 3)
+  {
+    pico_unique_board_id_t retrieved_id;
+    pico_get_unique_board_id(&retrieved_id);
+
+    for (size_t i = 0; i < 16; i++) {
+        int nibble = (retrieved_id.id[i/2] >> (4 - 4 * (i&1))) & 0xf;
+        _desc_str[i+1] = (uint16_t)(nibble < 10 ? nibble + '0' : nibble + 'A' - 10);
+    }
+    chr_count = 16;
   }
   else
   {
